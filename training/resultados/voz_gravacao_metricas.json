@@ -3,34 +3,34 @@
   "com_gravacao_em_repouso": {
     "dor_media_4_ou_mais": {
       "gravacoes": 145,
-      "com_dor": 77,
+      "positivas": 77,
       "AUROC": 0.7669977081741787,
       "AUROC_IC95_por_pessoa": [
         0.6963583558162139,
         0.8334089245229548
       ],
-      "sinal_presente_com_dor": {
+      "sinal_presente_nas_positivas": {
         "acertos": 54,
         "total": 77
       },
-      "sinal_ausente_sem_dor": {
+      "sinal_ausente_nas_negativas": {
         "acertos": 50,
         "total": 68
       }
     },
     "frio_contra_morno": {
       "gravacoes": 145,
-      "com_dor": 96,
+      "positivas": 96,
       "AUROC": 0.7944302721088436,
       "AUROC_IC95_por_pessoa": [
         0.728707524342689,
         0.8552082107843137
       ],
-      "sinal_presente_com_dor": {
+      "sinal_presente_nas_positivas": {
         "acertos": 63,
         "total": 96
       },
-      "sinal_ausente_sem_dor": {
+      "sinal_ausente_nas_negativas": {
         "acertos": 40,
         "total": 49
       }
@@ -39,34 +39,34 @@
   "sem_gravacao_em_repouso": {
     "dor_media_4_ou_mais": {
       "gravacoes": 145,
-      "com_dor": 77,
+      "positivas": 77,
       "AUROC": 0.6694041252864783,
       "AUROC_IC95_por_pessoa": [
         0.5957734073359073,
         0.739091002466718
       ],
-      "sinal_presente_com_dor": {
+      "sinal_presente_nas_positivas": {
         "acertos": 46,
         "total": 77
       },
-      "sinal_ausente_sem_dor": {
+      "sinal_ausente_nas_negativas": {
         "acertos": 46,
         "total": 68
       }
     },
     "frio_contra_morno": {
       "gravacoes": 145,
-      "com_dor": 96,
+      "positivas": 96,
       "AUROC": 0.6568877551020409,
       "AUROC_IC95_por_pessoa": [
         0.6063162714478504,
         0.7130677300394823
       ],
-      "sinal_presente_com_dor": {
+      "sinal_presente_nas_positivas": {
         "acertos": 52,
         "total": 96
       },
-      "sinal_ausente_sem_dor": {
+      "sinal_ausente_nas_negativas": {
         "acertos": 33,
         "total": 49
       }

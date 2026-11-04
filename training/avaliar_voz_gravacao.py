@@ -36,11 +36,11 @@ def summarize(y: np.ndarray, score: np.ndarray, groups: np.ndarray) -> dict:
     predicted = score >= training.DECISION_THRESHOLD
     return {
         "gravacoes": int(len(y)),
-        "com_dor": int(y.sum()),
+        "positivas": int(y.sum()),
         "AUROC": float(roc_auc_score(y, score)),
         "AUROC_IC95_por_pessoa": training.participant_bootstrap_ci(y, score, groups),
-        "sinal_presente_com_dor": {"acertos": int((predicted & (y == 1)).sum()), "total": int(y.sum())},
-        "sinal_ausente_sem_dor": {"acertos": int((~predicted & (y == 0)).sum()), "total": int((y == 0).sum())},
+        "sinal_presente_nas_positivas": {"acertos": int((predicted & (y == 1)).sum()), "total": int(y.sum())},
+        "sinal_ausente_nas_negativas": {"acertos": int((~predicted & (y == 0)).sum()), "total": int((y == 0).sum())},
     }
 
 

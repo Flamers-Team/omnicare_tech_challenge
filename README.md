@@ -12,7 +12,7 @@ O guia completo, escrito para quem está começando, está em [docs/Guia_do_Proj
 | Prescrições | MIMIC-IV Demo 2.2 | Mudanças fortes de dose e inícios tardios | Pronto |
 | Marcha (esqueleto de sensores) | Multi-Gait-Posture | 13 medidas e pontuação z robusta | Pronto |
 | Marcha (vídeo) | Vídeo do grupo | MediaPipe Pose e a mesma referência | Código pronto, sem validação com vídeo real |
-| Voz (som) | TAME Pain | Medidas acústicas e regressão logística | Modelo treinado, ainda não ligado |
+| Voz (som) | TAME Pain | Medidas acústicas e regressão logística | Pronto; falta testar com gravação em português |
 | Fala (conteúdo) | Consulta gravada pelo grupo | Azure Speech to Text e Azure Text Analytics | Código pronto, faltam chaves e teste |
 | Vídeo de cirurgia | Endoscapes2023 | YOLOv8s e ResNet18, um frame a cada 5 segundos | Pronto, com as limitações descritas na seção 4 |
 
@@ -44,7 +44,7 @@ AZURE_LANGUAGE_ENDPOINT=
 
 ### Modelos de cirurgia
 
-Os pesos foram treinados com uma base de licença restrita e não fazem parte do repositório. Sem eles, a aba de cirurgia mostra as métricas, mas a análise fica desligada. Para ligá-la, gere os arquivos com `training/omnicare_endoscapes_colab.ipynb` e copie `endoscapes_yolov8s.pt` e `cvs_resnet18.pt` para `backend/models/`.
+Os pesos `endoscapes_yolov8s.pt` e `cvs_resnet18.pt` ficam em `backend/models/`. Eles foram gerados com `training/omnicare_endoscapes_colab.ipynb` a partir de uma base de licença restrita, mas não contêm os frames. Sem eles, a aba de cirurgia mostra as métricas e a análise fica desligada.
 
 Para analisar os vídeos de teste, quem tiver acesso à base pode gerar o zip com `training/prepare_endoscapes.py`. O sistema procura `endoscapes_omnicare.zip` na pasta Downloads; em outro local, informe o caminho na variável de ambiente `ENDOSCAPES_ZIP`. Nenhuma imagem é salva ou exibida.
 
@@ -75,7 +75,7 @@ Os arquivos completos estão em `training/resultados/`. As anomalias de sinais v
 
 **Marcha** (cada pessoa fora da referência): alarme falso de 7,1% em linha reta; detecção de 100% com o tronco 20° à frente e de 38,1% com o tronco 10° à frente. Na pior pessoa saudável, o alarme falso foi de 66,7%.
 
-**Voz** (51 pessoas, sempre testando em pessoas novas): AUROC de 0,72 para dor ≥ 4 com gravação de base e de 0,65 sem ela. Dor e frio quase coincidem nessa base, então o resultado é um sinal vocal associado à dor induzida, e não uma medida de dor.
+**Voz** (51 pessoas, sempre testando em pessoas novas): AUROC de 0,72 para dor ≥ 4 com gravação de base e de 0,65 sem ela. Dor e frio quase coincidem nessa base, então o resultado é um sinal vocal associado à dor induzida, e não uma medida de dor. Por gravação, como o sistema usa (média das frases de uma pessoa em uma condição), o AUROC foi de 0,77 (IC 95%: 0,70 a 0,83) com a gravação em repouso e de 0,67 (IC 95%: 0,60 a 0,74) sem ela. Sem a gravação em repouso, o sinal aparece na tela, mas não soma pontos no risco. O modelo não foi validado em português nem com outros microfones.
 
 **Cirurgia, detecção de estruturas** (YOLOv8s, 312 frames de teste):
 
