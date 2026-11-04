@@ -1,0 +1,135 @@
+{
+  "gerado_em": "2026-11-04T18:41:05+00:00",
+  "dataset": "TAME Pain 1.0.0",
+  "hash_do_audio_conferido": true,
+  "amostra": {
+    "audios_usados": 4685,
+    "participantes": 51,
+    "filtro": "frases lidas, sem declarações de dor, ACTION LABEL <= 2",
+    "gravacao_de_base": "condição LW, usada só para calibrar"
+  },
+  "validacao": {
+    "tipo": "StratifiedGroupKFold por participante",
+    "folds": 5,
+    "repeticoes": 5,
+    "bootstrap": 1000
+  },
+  "modelo": "StandardScaler + LogisticRegression(class_weight='balanced')",
+  "cenarios": {
+    "principal_dor_calibrado": {
+      "audios": 3371,
+      "participantes": 51,
+      "positivos": 0.5265499851676061,
+      "AUROC_media_folds": 0.7216117413395778,
+      "AUROC_dp_folds": 0.04390201765125536,
+      "AUROC_IC95_por_participante": [
+        0.6740133771432809,
+        0.7709087575151734
+      ],
+      "precisao": 0.6950146627565983,
+      "recall": 0.6676056338028169,
+      "F1": 0.6810344827586207,
+      "acuracia_balanceada": 0.6708955487309824,
+      "matriz": {
+        "VP": 1185,
+        "FP": 520,
+        "FN": 590,
+        "VN": 1076
+      }
+    },
+    "comparacao_dor_sem_calibracao": {
+      "audios": 3371,
+      "participantes": 51,
+      "positivos": 0.5265499851676061,
+      "AUROC_media_folds": 0.6474818638697662,
+      "AUROC_dp_folds": 0.053877998198666524,
+      "AUROC_IC95_por_participante": [
+        0.6025150053347169,
+        0.6972221570531181
+      ],
+      "precisao": 0.6386861313868614,
+      "recall": 0.5915492957746479,
+      "F1": 0.6142146826557473,
+      "acuracia_balanceada": 0.6096844223234141,
+      "matriz": {
+        "VP": 1050,
+        "FP": 594,
+        "FN": 725,
+        "VN": 1002
+      }
+    },
+    "limite_frio_x_morno_calibrado": {
+      "audios": 3371,
+      "participantes": 51,
+      "positivos": 0.621477306437259,
+      "AUROC_media_folds": 0.7236155327179417,
+      "AUROC_dp_folds": 0.0440811649188859,
+      "AUROC_IC95_por_participante": [
+        0.6756625902973246,
+        0.765816258339409
+      ],
+      "precisao": 0.7653508771929824,
+      "recall": 0.6663484486873509,
+      "F1": 0.712426639448839,
+      "acuracia_balanceada": 0.665462625597594,
+      "matriz": {
+        "VP": 1396,
+        "FP": 428,
+        "FN": 699,
+        "VN": 848
+      }
+    },
+    "limite_severa_dentro_do_frio": {
+      "audios": 2095,
+      "participantes": 51,
+      "positivos": 0.34272076372315036,
+      "AUROC_media_folds": 0.5680970813913969,
+      "AUROC_dp_folds": 0.07947174388376198,
+      "AUROC_IC95_por_participante": [
+        0.48512808198745133,
+        0.6444180788495256
+      ],
+      "precisao": 0.39568345323741005,
+      "recall": 0.5362116991643454,
+      "F1": 0.4553518628030751,
+      "acuracia_balanceada": 0.5545982243098415,
+      "matriz": {
+        "VP": 385,
+        "FP": 588,
+        "FN": 333,
+        "VN": 789
+      }
+    },
+    "controle_rotulos_embaralhados": {
+      "audios": 3371,
+      "participantes": 51,
+      "positivos": 0.5265499851676061,
+      "AUROC_media_folds": 0.51060089001384,
+      "AUROC_dp_folds": 0.015656450284796588,
+      "AUROC_IC95_por_participante": [
+        0.4953079879675936,
+        0.5263504517843435
+      ],
+      "precisao": 0.5393724097098875,
+      "recall": 0.5132394366197183,
+      "F1": 0.5259815242494227,
+      "acuracia_balanceada": 0.5128853824702602,
+      "matriz": {
+        "VP": 911,
+        "FP": 778,
+        "FN": 864,
+        "VN": 818
+      }
+    }
+  },
+  "limitacoes": [
+    "Dor induzida em laboratório por água fria, em pessoas saudáveis de 18 a 33 anos; não são pacientes.",
+    "Distúrbios neurológicos foram critério de exclusão, então a base não cobre disartria; fadiga também não tem rótulo.",
+    "A dor quase coincide com a condição de frio; compare o cenário principal com limite_frio_x_morno_calibrado.",
+    "O modelo não separa bem dor severa de dor menor; não deve exibir nota de dor.",
+    "Cada frase herda a nota da declaração de dor seguinte; o rótulo não é medido frase a frase.",
+    "A gravação de base é da mesma sessão e do mesmo microfone, e em 3 das 4 ordens do experimento vem depois de um frio; o AUROC calibrado tende a ser otimista para uso real.",
+    "Falantes fluentes em inglês, em sala controlada; o modelo não foi validado em português nem em outros microfones.",
+    "Indício de apoio à decisão, não diagnóstico."
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "como_foi_feito": "Média da nota das frases por pessoa e condição, sem a gravação de base, em validação cruzada por pessoa (5 divisões, 5 repetições).",
+  "com_gravacao_em_repouso": {
+    "dor_media_4_ou_mais": {
+      "gravacoes": 145,
+      "com_dor": 77,
+      "AUROC": 0.7669977081741787,
+      "AUROC_IC95_por_pessoa": [
+        0.6963583558162139,
+        0.8334089245229548
+      ],
+      "sinal_presente_com_dor": {
+        "acertos": 54,
+        "total": 77
+      },
+      "sinal_ausente_sem_dor": {
+        "acertos": 50,
+        "total": 68
+      }
+    },
+    "frio_contra_morno": {
+      "gravacoes": 145,
+      "com_dor": 96,
+      "AUROC": 0.7944302721088436,
+      "AUROC_IC95_por_pessoa": [
+        0.728707524342689,
+        0.8552082107843137
+      ],
+      "sinal_presente_com_dor": {
+        "acertos": 63,
+        "total": 96
+      },
+      "sinal_ausente_sem_dor": {
+        "acertos": 40,
+        "total": 49
+      }
+    }
+  },
+  "sem_gravacao_em_repouso": {
+    "dor_media_4_ou_mais": {
+      "gravacoes": 145,
+      "com_dor": 77,
+      "AUROC": 0.6694041252864783,
+      "AUROC_IC95_por_pessoa": [
+        0.5957734073359073,
+        0.739091002466718
+      ],
+      "sinal_presente_com_dor": {
+        "acertos": 46,
+        "total": 77
+      },
+      "sinal_ausente_sem_dor": {
+        "acertos": 46,
+        "total": 68
+      }
+    },
+    "frio_contra_morno": {
+      "gravacoes": 145,
+      "com_dor": 96,
+      "AUROC": 0.6568877551020409,
+      "AUROC_IC95_por_pessoa": [
+        0.6063162714478504,
+        0.7130677300394823
+      ],
+      "sinal_presente_com_dor": {
+        "acertos": 52,
+        "total": 96
+      },
+      "sinal_ausente_sem_dor": {
+        "acertos": 33,
+        "total": 49
+      }
+    }
+  },
+  "conferencia_do_corte_em_frases": {
+    "gravacoes_montadas": 11,
+    "frases_reais_mediana": 26.0,
+    "trechos_encontrados_mediana": 26.0,
+    "razao_trechos_por_frase_mediana": 1.0,
+    "diferenca_absoluta_na_nota_mediana": 0.03131121045182991,
+    "diferenca_absoluta_na_nota_maior": 0.057687200955903295
+  },
+  "aviso": "A dor quase coincide com o frio nesta base, e as gravações em repouso são da mesma sessão. Os números não valem para consultas reais nem para português."
+}

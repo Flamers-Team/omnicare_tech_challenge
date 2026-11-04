@@ -1,0 +1,172 @@
+{
+  "como_foi_escolhida": "Validação cruzada 5x20 nos 41 vídeos de validação, com limiares ajustados dentro de cada divisão. Entre as regras a até 0.02 da melhor acurácia balanceada, vence a menos ligada à duração do vídeo.",
+  "aviso": "A candidata sem C1 foi incluída depois de vermos o desempenho do C1 no teste. Este é um segundo olhar sobre os mesmos 40 vídeos de teste, então o resultado tende a ser um pouco otimista.",
+  "auroc_de_cada_criterio_na_validacao": {
+    "C1": 0.6698564593301435,
+    "C2": 0.7440191387559809,
+    "C3": 0.661904761904762
+  },
+  "candidatas_validacao_cruzada": {
+    "pico|C1_C2_C3": {
+      "acuracia_balanceada": 0.6733333333333332,
+      "AUROC": 0.7521794871794872,
+      "spearman_frames_x_escore": -0.5140008559499033
+    },
+    "pico|C2_C3": {
+      "acuracia_balanceada": 0.6664102564102565,
+      "AUROC": 0.7346153846153847,
+      "spearman_frames_x_escore": -0.38437866318864183
+    },
+    "tres_maiores|C1_C2_C3": {
+      "acuracia_balanceada": 0.6417307692307692,
+      "AUROC": 0.7551282051282052,
+      "spearman_frames_x_escore": -0.6073147839304589
+    },
+    "tres_maiores|C2_C3": {
+      "acuracia_balanceada": 0.6526923076923076,
+      "AUROC": 0.7408974358974358,
+      "spearman_frames_x_escore": -0.46634978818631306
+    },
+    "quinto_maior|C1_C2_C3": {
+      "acuracia_balanceada": 0.5871794871794872,
+      "AUROC": 0.688205128205128,
+      "spearman_frames_x_escore": -0.26126011006383865
+    },
+    "quinto_maior|C2_C3": {
+      "acuracia_balanceada": 0.5591666666666667,
+      "AUROC": 0.6557692307692307,
+      "spearman_frames_x_escore": -0.2033580370538815
+    },
+    "tres_finais|C1_C2_C3": {
+      "acuracia_balanceada": 0.5827564102564102,
+      "AUROC": 0.6548717948717948,
+      "spearman_frames_x_escore": -0.23028429623249763
+    },
+    "tres_finais|C2_C3": {
+      "acuracia_balanceada": 0.5572435897435899,
+      "AUROC": 0.6946153846153844,
+      "spearman_frames_x_escore": -0.18123172647586058
+    }
+  },
+  "regra_escolhida": {
+    "nome": "pico|C2_C3",
+    "agregacao": "pico",
+    "criterios": [
+      "C2",
+      "C3"
+    ],
+    "limiares": {
+      "C2": 0.8004948566666666,
+      "C3": 0.8832062999999999
+    }
+  },
+  "teste": {
+    "regra_atual": {
+      "limiares": {
+        "C1": 0.8511036366666666,
+        "C2": 0.8004948566666666,
+        "C3": 0.8832062999999999
+      },
+      "videos": 40,
+      "matriz": {
+        "VP": 22,
+        "FP": 7,
+        "FN": 4,
+        "VN": 7
+      },
+      "desvios_detectados": {
+        "acertos": 22,
+        "total": 26,
+        "valor": 0.8461538461538461,
+        "ic95": [
+          0.6646880067178653,
+          0.9384996627642166
+        ]
+      },
+      "cvs_reconhecido": {
+        "acertos": 7,
+        "total": 14,
+        "valor": 0.5,
+        "ic95": [
+          0.2679920245241364,
+          0.7320079754758636
+        ]
+      },
+      "precisao": {
+        "acertos": 22,
+        "total": 29,
+        "valor": 0.7586206896551724,
+        "ic95": [
+          0.5789239838218867,
+          0.8778157755747991
+        ]
+      },
+      "acuracia": 0.725,
+      "acuracia_sempre_desvio": 0.65,
+      "acuracia_balanceada": 0.6730769230769231,
+      "AUROC": 0.7582417582417582,
+      "AUROC_IC95": [
+        0.580587721716754,
+        0.9148482982534707
+      ],
+      "mcnemar_contra_sempre_desvio_p": 0.548828125,
+      "spearman_frames_x_escore": -0.4900719769140041,
+      "motivo_nos_desvios_detectados": {
+        "total": 22,
+        "apontou_ao_menos_um_criterio_ausente": 20,
+        "apontou_exatamente_os_ausentes": 8
+      }
+    },
+    "regra_escolhida": {
+      "videos": 40,
+      "matriz": {
+        "VP": 20,
+        "FP": 4,
+        "FN": 6,
+        "VN": 10
+      },
+      "desvios_detectados": {
+        "acertos": 20,
+        "total": 26,
+        "valor": 0.7692307692307693,
+        "ic95": [
+          0.5794844592105632,
+          0.8896615059421671
+        ]
+      },
+      "cvs_reconhecido": {
+        "acertos": 10,
+        "total": 14,
+        "valor": 0.7142857142857143,
+        "ic95": [
+          0.4535091567010682,
+          0.8827862135542307
+        ]
+      },
+      "precisao": {
+        "acertos": 20,
+        "total": 24,
+        "valor": 0.8333333333333334,
+        "ic95": [
+          0.6414692935030095,
+          0.9332132367136705
+        ]
+      },
+      "acuracia": 0.75,
+      "acuracia_sempre_desvio": 0.65,
+      "acuracia_balanceada": 0.7417582417582418,
+      "AUROC": 0.782967032967033,
+      "AUROC_IC95": [
+        0.5999725274725275,
+        0.9373263888888888
+      ],
+      "mcnemar_contra_sempre_desvio_p": 0.454498291015625,
+      "spearman_frames_x_escore": -0.41130370322993337,
+      "motivo_nos_desvios_detectados": {
+        "total": 20,
+        "apontou_ao_menos_um_criterio_ausente": 18,
+        "apontou_exatamente_os_ausentes": 12
+      }
+    }
+  }
+}

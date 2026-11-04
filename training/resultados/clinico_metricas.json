@@ -1,0 +1,169 @@
+{
+  "gerado_em": "2026-11-04T20:34:08+00:00",
+  "base": "MIMIC-IV Clinical Database Demo 2.2",
+  "amostra": {
+    "pacientes": 100,
+    "internacoes_uti": 140,
+    "horas_com_medida": 12085,
+    "pacientes_para_ajuste": 50,
+    "pacientes_para_teste": 50
+  },
+  "limiar_escolhido": 3.0,
+  "criterio_do_limiar": "maior detecção com até 1.0 evento por paciente/dia e até 5% de disparo por acaso, na metade de ajuste",
+  "isolation_forest_ajuste": {
+    "0.9": {
+      "quantil": 0.9,
+      "eventos": 85,
+      "eventos_por_paciente_dia": 0.31,
+      "disparo_por_acaso": 0.083,
+      "deteccao": {
+        "moderada": 0.261,
+        "forte": 0.522
+      },
+      "casos_simulados": 180
+    },
+    "0.95": {
+      "quantil": 0.95,
+      "eventos": 37,
+      "eventos_por_paciente_dia": 0.13,
+      "disparo_por_acaso": 0.028,
+      "deteccao": {
+        "moderada": 0.117,
+        "forte": 0.294
+      },
+      "casos_simulados": 180
+    },
+    "0.97": {
+      "quantil": 0.97,
+      "eventos": 23,
+      "eventos_por_paciente_dia": 0.08,
+      "disparo_por_acaso": 0.022,
+      "deteccao": {
+        "moderada": 0.05,
+        "forte": 0.183
+      },
+      "casos_simulados": 180
+    },
+    "0.99": {
+      "quantil": 0.99,
+      "eventos": 8,
+      "eventos_por_paciente_dia": 0.03,
+      "disparo_por_acaso": 0.006,
+      "deteccao": {
+        "moderada": 0.028,
+        "forte": 0.033
+      },
+      "casos_simulados": 180
+    }
+  },
+  "ajuste_limiar": {
+    "3.0": {
+      "eventos": 144,
+      "eventos_por_paciente_dia": 0.52,
+      "deteccao": {
+        "moderada": 0.428,
+        "forte": 0.694
+      },
+      "disparo_por_acaso": 0.033,
+      "casos_simulados": 180
+    },
+    "4.0": {
+      "eventos": 52,
+      "eventos_por_paciente_dia": 0.19,
+      "deteccao": {
+        "moderada": 0.256,
+        "forte": 0.528
+      },
+      "disparo_por_acaso": 0.011,
+      "casos_simulados": 180
+    },
+    "5.0": {
+      "eventos": 23,
+      "eventos_por_paciente_dia": 0.08,
+      "deteccao": {
+        "moderada": 0.106,
+        "forte": 0.378
+      },
+      "disparo_por_acaso": 0.011,
+      "casos_simulados": 180
+    },
+    "6.0": {
+      "eventos": 9,
+      "eventos_por_paciente_dia": 0.03,
+      "deteccao": {
+        "moderada": 0.056,
+        "forte": 0.306
+      },
+      "disparo_por_acaso": 0.006,
+      "casos_simulados": 180
+    }
+  },
+  "sinais_vitais_teste": {
+    "z_do_proprio_paciente": {
+      "eventos": 139,
+      "eventos_por_paciente_dia": 0.6,
+      "deteccao": {
+        "moderada": 0.462,
+        "forte": 0.672
+      },
+      "disparo_por_acaso": 0.048,
+      "casos_simulados": 186
+    },
+    "regras_fixas": {
+      "eventos": 672,
+      "eventos_por_paciente_dia": 2.91,
+      "deteccao": {
+        "moderada": 0.551,
+        "forte": 0.705
+      },
+      "disparo_por_acaso": 0.193,
+      "casos_simulados": 176
+    },
+    "isolation_forest": {
+      "quantil": 0.9,
+      "eventos": 82,
+      "eventos_por_paciente_dia": 0.36,
+      "disparo_por_acaso": 0.075,
+      "deteccao": {
+        "moderada": 0.253,
+        "forte": 0.516
+      },
+      "casos_simulados": 186
+    }
+  },
+  "prescricoes": {
+    "internacoes": 250,
+    "dias_de_internacao": 1866.7,
+    "eventos": {
+      "mudanca_de_dose": 872,
+      "inicio_alta_vigilancia": 330
+    },
+    "eventos_de_gravidade_alta": 49,
+    "eventos_por_internacao_dia": 0.64,
+    "eventos_alta_por_internacao_dia": 0.026,
+    "dose_10x_simulada": {
+      "casos": 300,
+      "detectados": 266,
+      "taxa": 0.887
+    }
+  },
+  "alerta_combinado_teste": {
+    "avisos_por_paciente_dia": {
+      "atencao": 0.5,
+      "alto": 0.24
+    },
+    "fracao_das_horas": {
+      "baixo": 0.641,
+      "atencao": 0.291,
+      "alto": 0.068
+    }
+  },
+  "limitacoes": [
+    "A base não tem rótulos de anomalia; não é possível medir acerto clínico real.",
+    "As alterações são simuladas sobre dados reais; a detecção mostrada é um teste de engenharia.",
+    "Pacientes de UTI em uma amostra de 100 pessoas de um único hospital dos EUA.",
+    "Muitas mudanças de dose são condutas corretas; o evento pede revisão, não indica erro.",
+    "A lista de medicamentos de alta vigilância é simplificada e não foi validada clinicamente.",
+    "Apoio à decisão, não diagnóstico."
+  ]
+}

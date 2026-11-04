@@ -1,0 +1,3 @@
+Caminhadas derivadas de: Palermo et al. (2021), A multi-camera and multimodal dataset for posture and gait analysis (version 1.0.0), PhysioNet, https://doi.org/10.13026/fyxw-n385, CC BY 4.0.
+Trecho de origem: participant00/participant00_straight_0.5/participant00_straight_0.5_corridor1/normalized_skeleton_3d.csv
+caminhada_tronco_20_graus.csv.gz é a mesma caminhada com o tronco girado 20 graus à frente, uma alteração simulada.

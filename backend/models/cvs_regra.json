@@ -1,0 +1,44 @@
+{
+  "agregacao": "pico",
+  "janela_media": 3,
+  "intervalo_s": 5,
+  "limiares": {
+    "C2": 0.8004948566666666,
+    "C3": 0.8832062999999999
+  },
+  "confianca_detector": 0.31,
+  "detector_ap50_teste": {
+    "cystic_plate": 0.25,
+    "calot_triangle": 0.552,
+    "cystic_artery": 0.49,
+    "cystic_duct": 0.527,
+    "gallbladder": 0.949,
+    "tool": 0.908
+  },
+  "desempenho_teste": {
+    "videos": 40,
+    "desvios_detectados": {
+      "acertos": 20,
+      "total": 26,
+      "valor": 0.7692307692307693,
+      "ic95": [
+        0.5794844592105632,
+        0.8896615059421671
+      ]
+    },
+    "cvs_reconhecido": {
+      "acertos": 10,
+      "total": 14,
+      "valor": 0.7142857142857143,
+      "ic95": [
+        0.4535091567010682,
+        0.8827862135542307
+      ]
+    },
+    "AUROC": 0.782967032967033,
+    "AUROC_IC95": [
+      0.5999725274725275,
+      0.9373263888888888
+    ]
+  }
+}

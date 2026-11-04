@@ -1,0 +1,199 @@
+{
+  "base": "A multi-camera and multimodal dataset for posture and gait analysis 1.0.0",
+  "amostra": {
+    "participantes": 14,
+    "caminhadas": 367,
+    "janelas": {
+      "left": 247,
+      "right": 259,
+      "straight": 475
+    }
+  },
+  "validacao": "Uma pessoa fora por vez; limiar definido sem olhar a pessoa testada; pontuação da caminhada é a mediana das janelas.",
+  "meta_falso_alarme": 0.05,
+  "metodo_escolhido": "z_robusto",
+  "comparacao": {
+    "z_robusto": {
+      "falso_alarme_linha_reta": 0.07142857142857142,
+      "falso_alarme_pior_pessoa": 0.6666666666666666,
+      "falso_alarme_curvas": 0.11974789915966387,
+      "deteccao": {
+        "tronco 10 graus a mais para frente": 0.3809523809523809,
+        "tronco 20 graus a mais para frente": 1.0,
+        "balanço lateral de 5 graus": 0.9761904761904763,
+        "balanço lateral de 10 graus": 1.0,
+        "perna esquerda com passo 20% menor": 0.6240079365079365,
+        "perna esquerda com passo 40% menor": 1.0,
+        "um passo 30% mais lento": 0.20238095238095238,
+        "um passo 60% mais lento": 0.8521825396825398
+      },
+      "AUROC": {
+        "tronco 10 graus a mais para frente": 0.9264150683421518,
+        "tronco 20 graus a mais para frente": 0.9781746031746031,
+        "balanço lateral de 5 graus": 0.9712301587301587,
+        "balanço lateral de 10 graus": 1.0,
+        "perna esquerda com passo 20% menor": 0.8971560846560847,
+        "perna esquerda com passo 40% menor": 0.9971340388007055,
+        "um passo 30% mais lento": 0.8060378086419754,
+        "um passo 60% mais lento": 0.9462081128747795
+      }
+    },
+    "mahalanobis": {
+      "falso_alarme_linha_reta": 0.041666666666666664,
+      "falso_alarme_pior_pessoa": 0.25,
+      "falso_alarme_curvas": 0.119281045751634,
+      "deteccao": {
+        "tronco 10 graus a mais para frente": 0.8204365079365079,
+        "tronco 20 graus a mais para frente": 1.0,
+        "balanço lateral de 5 graus": 1.0,
+        "balanço lateral de 10 graus": 1.0,
+        "perna esquerda com passo 20% menor": 0.14880952380952378,
+        "perna esquerda com passo 40% menor": 0.3273809523809524,
+        "um passo 30% mais lento": 0.03968253968253969,
+        "um passo 60% mais lento": 0.06349206349206349
+      },
+      "AUROC": {
+        "tronco 10 graus a mais para frente": 0.9302799823633158,
+        "tronco 20 graus a mais para frente": 1.0,
+        "balanço lateral de 5 graus": 1.0,
+        "balanço lateral de 10 graus": 1.0,
+        "perna esquerda com passo 20% menor": 0.7119433421516755,
+        "perna esquerda com passo 40% menor": 0.9113618827160493,
+        "um passo 30% mais lento": 0.51956569664903,
+        "um passo 60% mais lento": 0.6331294091710759
+      }
+    },
+    "isolation_forest": {
+      "falso_alarme_linha_reta": 0.055555555555555546,
+      "falso_alarme_pior_pessoa": 0.6666666666666666,
+      "falso_alarme_curvas": 0.10317460317460318,
+      "deteccao": {
+        "tronco 10 graus a mais para frente": 0.12797619047619047,
+        "tronco 20 graus a mais para frente": 0.12797619047619047,
+        "balanço lateral de 5 graus": 0.24801587301587302,
+        "balanço lateral de 10 graus": 0.24801587301587302,
+        "perna esquerda com passo 20% menor": 0.375,
+        "perna esquerda com passo 40% menor": 0.9365079365079365,
+        "um passo 30% mais lento": 0.09126984126984126,
+        "um passo 60% mais lento": 0.3174603174603175
+      },
+      "AUROC": {
+        "tronco 10 graus a mais para frente": 0.8300402336860669,
+        "tronco 20 graus a mais para frente": 0.8498952821869487,
+        "balanço lateral de 5 graus": 0.937748015873016,
+        "balanço lateral de 10 graus": 0.937748015873016,
+        "perna esquerda com passo 20% menor": 0.8667465828924164,
+        "perna esquerda com passo 40% menor": 0.9770723104056438,
+        "um passo 30% mais lento": 0.7367173721340388,
+        "um passo 60% mais lento": 0.9095017636684303
+      }
+    },
+    "regra_atual": {
+      "falso_alarme_linha_reta": 0.1587301587301587,
+      "falso_alarme_pior_pessoa": 0.6666666666666666,
+      "falso_alarme_curvas": 0.08683473389355743,
+      "deteccao": {
+        "tronco 10 graus a mais para frente": 0.2857142857142857,
+        "tronco 20 graus a mais para frente": 1.0,
+        "balanço lateral de 5 graus": 0.1587301587301587,
+        "balanço lateral de 10 graus": 0.1587301587301587,
+        "perna esquerda com passo 20% menor": 0.11111111111111113,
+        "perna esquerda com passo 40% menor": 0.14285714285714285,
+        "um passo 30% mais lento": 0.13095238095238096,
+        "um passo 60% mais lento": 0.16666666666666666
+      },
+      "AUROC": {
+        "tronco 10 graus a mais para frente": 0.8536155202821869,
+        "tronco 20 graus a mais para frente": 0.9599867724867724,
+        "balanço lateral de 5 graus": 0.5222800925925927,
+        "balanço lateral de 10 graus": 0.5249255952380952,
+        "perna esquerda com passo 20% menor": 0.4679026124338624,
+        "perna esquerda com passo 40% menor": 0.48725473985890655,
+        "um passo 30% mais lento": 0.468832671957672,
+        "um passo 60% mais lento": 0.48780588624338617
+      }
+    }
+  },
+  "medianas_saudaveis_por_velocidade": {
+    "passo_medio": {
+      "0.3": 0.389,
+      "0.5": 0.468,
+      "0.7": 0.545
+    },
+    "assimetria_passo": {
+      "0.3": 0.095,
+      "0.5": 0.068,
+      "0.7": 0.06
+    },
+    "assimetria_tempo": {
+      "0.3": 0.073,
+      "0.5": 0.07,
+      "0.7": 0.047
+    },
+    "cadencia": {
+      "0.3": 48.913,
+      "0.5": 67.021,
+      "0.7": 78.049
+    },
+    "cv_tempo": {
+      "0.3": 0.064,
+      "0.5": 0.063,
+      "0.7": 0.048
+    },
+    "cv_passo": {
+      "0.3": 0.073,
+      "0.5": 0.067,
+      "0.7": 0.048
+    },
+    "largura_passo": {
+      "0.3": 0.137,
+      "0.5": 0.147,
+      "0.7": 0.155
+    },
+    "tronco_frente_media": {
+      "0.3": 5.275,
+      "0.5": 5.88,
+      "0.7": 4.697
+    },
+    "tronco_frente_dp": {
+      "0.3": 1.33,
+      "0.5": 1.398,
+      "0.7": 1.446
+    },
+    "tronco_lado_abs": {
+      "0.3": 0.597,
+      "0.5": 0.523,
+      "0.7": 0.472
+    },
+    "tronco_lado_dp": {
+      "0.3": 0.962,
+      "0.5": 1.037,
+      "0.7": 1.018
+    },
+    "joelho_amplitude": {
+      "0.3": 50.402,
+      "0.5": 56.567,
+      "0.7": 58.737
+    },
+    "assimetria_joelho": {
+      "0.3": 0.066,
+      "0.5": 0.077,
+      "0.7": 0.062
+    }
+  },
+  "limitacoes": [
+    "Só adultos jovens e saudáveis, usando andador, em velocidades lentas (0,3, 0,5 e 0,7 m/s); não há casos reais de marcha alterada.",
+    "As anomalias são simuladas e alteram o que as próprias medidas observam; a detecção é otimista e não prova desempenho em pacientes.",
+    "O método foi escolhido usando as mesmas simulações do teste.",
+    "A referência vem de sensores inerciais; o uso com MediaPipe em vídeo ainda não foi validado.",
+    "A base não calcula nem valida métricas de marcha; as medidas foram calculadas neste notebook.",
+    "Algumas pessoas saudáveis geram mais alarmes falsos; veja falso_alarme_pior_pessoa.",
+    "Apoio à decisão, não diagnóstico."
+  ],
+  "versoes": {
+    "numpy": "1.26.4",
+    "pandas": "2.2.2",
+    "scipy": "1.14.1",
+    "scikit-learn": "1.5.2"
+  }
+}

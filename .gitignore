@@ -1,0 +1,19 @@
+# Chaves de acesso
+.env
+
+# Ambiente Python
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Arquivos gerados durante a execução
+backend/temp_uploads/
+backend/dados_locais/
+backend/yolov8n.pt
+
+# Bases de licença restrita nunca entram no repositório
+*.zip
+*.npz
+**/endoscapes*/
+**/tame-pain*/

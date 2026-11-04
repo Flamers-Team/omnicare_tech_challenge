@@ -1,0 +1,274 @@
+{
+  "versoes": {
+    "ultralytics": "8.4.202",
+    "torch": "2.11.0+cu130"
+  },
+  "base": {
+    "dataset": "Endoscapes2023",
+    "classes": [
+      "cystic_plate",
+      "calot_triangle",
+      "cystic_artery",
+      "cystic_duct",
+      "gallbladder",
+      "tool"
+    ],
+    "criteria": [
+      "C1",
+      "C2",
+      "C3"
+    ],
+    "cvs_threshold": 0.5,
+    "end_window_frames": 3,
+    "frame_size": [
+      854,
+      480
+    ],
+    "limit_videos": null,
+    "frames_cvs": {
+      "train": 6960,
+      "val": 2331,
+      "test": 1799
+    },
+    "frames_det": {
+      "train": 1212,
+      "val": 409,
+      "test": 312
+    },
+    "boxes": {
+      "train": 5566,
+      "val": 1733,
+      "test": 1485
+    },
+    "videos": {
+      "train": 120,
+      "val": 41,
+      "test": 40
+    },
+    "video_status": {
+      "train": {
+        "nunca_atingiu": 87,
+        "perdeu_no_fim": 6,
+        "atingiu_no_fim": 27
+      },
+      "val": {
+        "nunca_atingiu": 26,
+        "atingiu_no_fim": 13,
+        "perdeu_no_fim": 2
+      },
+      "test": {
+        "nunca_atingiu": 27,
+        "atingiu_no_fim": 13
+      }
+    }
+  },
+  "yolov8_teste": {
+    "precision": 0.68967132306385,
+    "recall": 0.6012950573379516,
+    "mAP50": 0.6128568297556186,
+    "mAP50_95": 0.3817026629329075,
+    "per_class": {
+      "cystic_plate": {
+        "AP50": 0.24977252902842487,
+        "AP50_95": 0.08803236476347748
+      },
+      "calot_triangle": {
+        "AP50": 0.5524842778183976,
+        "AP50_95": 0.3019953689291885
+      },
+      "cystic_artery": {
+        "AP50": 0.48956830452251066,
+        "AP50_95": 0.19127869168631875
+      },
+      "cystic_duct": {
+        "AP50": 0.5274504130564213,
+        "AP50_95": 0.19220253496294915
+      },
+      "gallbladder": {
+        "AP50": 0.9493767462336621,
+        "AP50_95": 0.7494755717136524
+      },
+      "tool": {
+        "AP50": 0.9084887078742951,
+        "AP50_95": 0.7672314455418581
+      }
+    }
+  },
+  "cvs_limiares": {
+    "por_frame": {
+      "C1": 0.644607424736023,
+      "C2": 0.8094448447227478,
+      "C3": 0.7573991417884827
+    },
+    "por_video": {
+      "C1": 0.851103683312734,
+      "C2": 0.8004954059918722,
+      "C3": 0.8832062482833862
+    }
+  },
+  "cvs_teste_por_frame": {
+    "C1": {
+      "prevalencia": 0.23513062812673707,
+      "AP": 0.4246593539346484,
+      "precisao": 0.40902021772939345,
+      "recall": 0.6217494089834515,
+      "F1": 0.49343339587242024,
+      "acuracia_balanceada": 0.6727933091428886
+    },
+    "C2": {
+      "prevalencia": 0.1678710394663702,
+      "AP": 0.39669811397091936,
+      "precisao": 0.4201954397394137,
+      "recall": 0.4271523178807947,
+      "F1": 0.4236453201970443,
+      "acuracia_balanceada": 0.6541239211314461
+    },
+    "C3": {
+      "prevalencia": 0.2784880489160645,
+      "AP": 0.5618608502219844,
+      "precisao": 0.4918300653594771,
+      "recall": 0.6007984031936128,
+      "F1": 0.5408805031446541,
+      "acuracia_balanceada": 0.6805995097632163
+    },
+    "CVS_completo": {
+      "prevalencia": 0.07559755419677598,
+      "AP": 0.26187539142131505,
+      "precisao": 0.3317757009345794,
+      "recall": 0.5220588235294118,
+      "F1": 0.4057142857142857,
+      "acuracia_balanceada": 0.7180348236708995,
+      "acuracia_sempre_incompleto": 0.9244024458032241
+    }
+  },
+  "desvio_por_video": {
+    "validacao_usada_nos_limiares": {
+      "videos": 41,
+      "desvios_reais": 26,
+      "AUROC": 0.7615384615384615,
+      "AUROC_IC95": [
+        0.5857609180035651,
+        0.9074074074074073
+      ],
+      "precisao": 0.7586206896551724,
+      "recall": 0.8461538461538461,
+      "F1": 0.8,
+      "acuracia": 0.7317073170731707,
+      "acuracia_balanceada": 0.6897435897435897,
+      "acuracia_sempre_desvio": 0.6341463414634146,
+      "matriz": {
+        "VP": 22,
+        "FP": 7,
+        "FN": 4,
+        "VN": 8
+      }
+    },
+    "teste": {
+      "videos": 40,
+      "desvios_reais": 26,
+      "AUROC": 0.7582417582417582,
+      "AUROC_IC95": [
+        0.580587721716754,
+        0.9148482982534707
+      ],
+      "precisao": 0.7586206896551724,
+      "recall": 0.8461538461538461,
+      "F1": 0.8,
+      "acuracia": 0.725,
+      "acuracia_balanceada": 0.6730769230769231,
+      "acuracia_sempre_desvio": 0.65,
+      "matriz": {
+        "VP": 22,
+        "FP": 7,
+        "FN": 4,
+        "VN": 7
+      }
+    }
+  },
+  "videos_com_cvs": {
+    "test": 14,
+    "train": 34,
+    "val": 15
+  },
+  "definicao_desvio": "O vídeo chegou ao primeiro clipe sem que C1, C2 e C3 aparecessem, cada um, em ao menos um frame rotulado (não necessariamente juntos), com cada critério definido pela maioria de 3 especialistas. Regra do relatório técnico da base.",
+  "referencias_publicadas": {
+    "fonte": "Murali et al., 2023, arXiv:2312.12429, tabelas 2 e 7; outros modelos, apenas como referência.",
+    "deteccao_mAP50_95": {
+      "cystic_plate": [
+        8.0,
+        7.5,
+        9.3
+      ],
+      "calot_triangle": [
+        19.4,
+        18.4,
+        19.9
+      ],
+      "cystic_artery": [
+        12.6,
+        12.1,
+        14.9
+      ],
+      "cystic_duct": [
+        15.5,
+        13.8,
+        19.0
+      ],
+      "gallbladder": [
+        62.9,
+        61.5,
+        69.6
+      ],
+      "tool": [
+        61.5,
+        62.4,
+        63.7
+      ],
+      "geral": [
+        30.0,
+        29.3,
+        32.7
+      ]
+    },
+    "cvs": {
+      "ResNet50": {
+        "mAP": {
+          "C1": 42.9,
+          "C2": 46.5,
+          "C3": 65.1,
+          "media": 51.5
+        },
+        "bAcc": {
+          "C1": 57.6,
+          "C2": 63.7,
+          "C3": 70.2,
+          "media": 63.8
+        }
+      },
+      "LG-CVS": {
+        "mAP": {
+          "media": 63.3
+        },
+        "bAcc": {
+          "media": 74.9
+        }
+      },
+      "SV2LSTG": {
+        "mAP": {
+          "media": 65.3
+        },
+        "bAcc": {
+          "media": 70.8
+        }
+      }
+    }
+  },
+  "limitacoes": [
+    "Base de um único centro (IHU-Strasbourg), com 201 pacientes e 22 cirurgiões.",
+    "Os cirurgiões discordam entre si: kappa de 0,38 no CVS (C1 0,33; C2 0,53; C3 0,44).",
+    "Os vídeos da base terminam no primeiro clipe; em um vídeo inteiro, esse momento precisa ser informado.",
+    "A classe tool não diferencia instrumentos, então o sistema não detecta a clipagem em si.",
+    "O teste tem só 40 vídeos; considere o intervalo de confiança.",
+    "Apoio à decisão, não diagnóstico."
+  ]
+}

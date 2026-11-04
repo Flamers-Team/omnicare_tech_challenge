@@ -1,0 +1,3 @@
+Dados derivados do MIMIC-IV Clinical Database Demo 2.2, https://physionet.org/content/mimic-iv-demo/2.2/.
+Licença: Open Database License (ODbL). Estes arquivos derivados seguem a mesma licença.
+Gerados por training/analyze_mimic_demo.py: medições agrupadas por hora, erros de sensor removidos e subject_id excluído.
