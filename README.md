@@ -34,7 +34,7 @@ Abra http://localhost:8000 no navegador. A instalação baixa o PyTorch e leva a
 
 ### Azure (voz e fala)
 
-As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição e não inventa texto. Para usá-las, copie `backend/.env.example` para `backend/.env` e preencha. O `.env` que nunca deve ir para o Git (ele já está no `.gitignore`):
+As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição e não inventa texto. Para usá-las, copie `backend/.env.example` para `backend/.env` e preencha. O `.env` nunca deve ir para o Git (ele já está no `.gitignore`). Variáveis:
 
 ```
 AZURE_SPEECH_KEY=
@@ -60,15 +60,52 @@ Os pesos `endoscapes_yolov8s.pt` e `cvs_resnet18.pt` ficam em `backend/models/`.
 
 Para analisar os vídeos de teste, quem tiver acesso à base pode gerar o zip com `training/prepare_endoscapes.py`. O sistema procura `endoscapes_omnicare.zip` na pasta Downloads; em outro local, informe o caminho na variável de ambiente `ENDOSCAPES_ZIP`. Nenhuma imagem é salva ou exibida.
 
+### Estrutura do projeto
+
+```
+omnicare_tech_challenge/
+├── backend/
+│   ├── app/                  # camada de API (FastAPI)
+│   │   ├── main.py           # cria o app, registra as rotas e serve o front
+│   │   ├── config.py         # caminhos, limites e variáveis de ambiente
+│   │   ├── deps.py           # serviços compartilhados (modelos, alertas)
+│   │   ├── monitoring.py     # montagem da resposta da internação e dos alertas
+│   │   ├── uploads.py        # recebimento seguro de arquivos
+│   │   └── routers/          # status, pacientes, marcha, voz, cirurgia, alertas
+│   ├── services/             # lógica de domínio (modelos, Azure, risco, laudo)
+│   ├── models/               # pesos e referências treinadas
+│   ├── sample_data/          # trechos das bases abertas
+│   ├── tests/                # testes da API e dos serviços
+│   ├── tests_e2e/            # testes no navegador (Playwright)
+│   ├── .env.example
+│   └── pyproject.toml        # configuração do pytest e do ruff
+├── frontend/                 # Vue 3 sem etapa de build
+│   ├── index.html
+│   ├── css/                  # tokens de design, base e componentes
+│   ├── js/                   # api, store, gráficos, áudio e componentes
+│   └── vendor/               # Vue e Chart.js locais (funciona sem internet)
+├── training/                 # treino, avaliação e resultados
+└── docs/                     # relatório técnico e guia
+```
+
+O front usa Vue 3 e Chart.js copiados para `frontend/vendor/`, então a demonstração não depende de internet. O tema claro ou escuro segue o sistema e pode ser trocado no botão do topo. Os alertas aparecem em tempo real, com um aviso flutuante e o contador na aba.
+
 ## 3. Testes
 
 ```powershell
 cd backend
 pip install -r requirements-dev.txt
-python -m pytest tests
+python -m pytest              # API e serviços, cerca de 1 minuto
+python -m ruff check app services tests tests_e2e
 ```
 
-A suíte leva cerca de 3 minutos.
+Os **testes de ponta a ponta** abrem o sistema no navegador (Microsoft Edge instalado no Windows, via Playwright), sobem o servidor numa porta livre com banco de alertas temporário e **sem chaves do Azure**, e simulam o microfone:
+
+```powershell
+python -m pytest tests_e2e
+```
+
+Eles cobrem o carregamento sem erros e sem CDN, os cinco gráficos, o monitoramento em tempo real, o fluxo do alerta até a confirmação, o envio de áudio e a gravação pelo microfone, a troca de tema e a tela de celular.
 
 ## 4. Resultados
 

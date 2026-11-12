@@ -7,7 +7,7 @@ FRONTEND_DIR = BASE_DIR.parent / "frontend"
 UPLOAD_DIR = BASE_DIR / "temp_uploads"
 MODELS_DIR = BASE_DIR / "models"
 SAMPLE_DIR = BASE_DIR / "sample_data"
-ALERTS_DB = BASE_DIR / "dados_locais" / "alertas.db"
+ALERTS_DB = Path(os.getenv("OMNICARE_ALERTS_DB") or BASE_DIR / "dados_locais" / "alertas.db")
 
 GAIT_EXAMPLES = {
     "normal": SAMPLE_DIR / "marcha" / "caminhada_normal.csv.gz",

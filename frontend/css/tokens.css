@@ -1,0 +1,93 @@
+/* Tokens de design. Troque os valores aqui para mudar a identidade visual. */
+:root {
+  color-scheme: light;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --bg: #f4f6fa;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f1f4f9;
+  --ink: #0f172a;
+  --ink-2: #475569;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --grid: #e8edf4;
+
+  --accent: #2563eb;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8efff;
+
+  --ok: #15803d;
+  --ok-soft: #e3f6ea;
+  --warn: #b45309;
+  --warn-soft: #fff1d6;
+  --crit: #dc2626;
+  --crit-soft: #fde8e8;
+  --info-soft: #e8efff;
+
+  --line: #2563eb;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 4px 14px rgba(15, 23, 42, .06);
+  --shadow-lg: 0 10px 30px rgba(15, 23, 42, .18);
+  --space: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0b1020;
+    --bg-elevated: #111830;
+    --surface: #111830;
+    --surface-2: #18213d;
+    --ink: #e8edf7;
+    --ink-2: #b6c0d4;
+    --muted: #8d99b3;
+    --border: #232d4b;
+    --border-strong: #33406a;
+    --grid: #1e2845;
+    --accent: #6b9bff;
+    --accent-ink: #0b1020;
+    --accent-soft: #1b2a55;
+    --ok: #4ade80;
+    --ok-soft: #12301f;
+    --warn: #fbbf24;
+    --warn-soft: #3a2a0a;
+    --crit: #f87171;
+    --crit-soft: #3d1618;
+    --info-soft: #1b2a55;
+    --line: #6b9bff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, .5);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --bg-elevated: #111830;
+  --surface: #111830;
+  --surface-2: #18213d;
+  --ink: #e8edf7;
+  --ink-2: #b6c0d4;
+  --muted: #8d99b3;
+  --border: #232d4b;
+  --border-strong: #33406a;
+  --grid: #1e2845;
+  --accent: #6b9bff;
+  --accent-ink: #0b1020;
+  --accent-soft: #1b2a55;
+  --ok: #4ade80;
+  --ok-soft: #12301f;
+  --warn: #fbbf24;
+  --warn-soft: #3a2a0a;
+  --crit: #f87171;
+  --crit-soft: #3d1618;
+  --info-soft: #1b2a55;
+  --line: #6b9bff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, .5);
+}

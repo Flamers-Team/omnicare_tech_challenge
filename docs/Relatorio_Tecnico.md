@@ -257,7 +257,8 @@ backend\.venv\Scripts\activate
 pip install -r backend\requirements.txt
 cd backend
 uvicorn app.main:app --port 8000
-python -m pytest tests
+python -m pytest
+python -m pytest tests_e2e   # testes no navegador
 ```
 
 Os scripts de treino e avaliação ficam em `training/`, e os resultados em `training/resultados/`.
