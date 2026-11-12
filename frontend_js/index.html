@@ -188,6 +188,17 @@
         <input id="voice-base" class="file" type="file" accept=".wav" @change="voiceBase = $event.target.files[0] || null" :disabled="voiceBusy" />
         <label for="voice-file" style="margin-top: 10px">2. Áudio da consulta, .wav. A análise começa ao escolher este arquivo</label>
         <input id="voice-file" class="file" type="file" accept=".wav" @change="voiceUpload" :disabled="voiceBusy" />
+        <p class="small muted" style="margin-top: 10px">Ou grave direto pelo microfone:</p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+          <button @click="toggleRecording('base')" :disabled="voiceBusy || (recording && recording !== 'base')">
+            {{ recording === 'base' ? '■ Parar' : '● Gravar repouso' }}
+          </button>
+          <button @click="toggleRecording('consulta')" :disabled="voiceBusy || (recording && recording !== 'consulta')">
+            {{ recording === 'consulta' ? '■ Parar e analisar' : '● Gravar consulta' }}
+          </button>
+          <span class="small" v-if="recording">Gravando... {{ recSeconds }} s</span>
+          <span class="small muted" v-else-if="voiceBase">Repouso pronto: {{ voiceBase.name }}</span>
+        </div>
         <p class="small" v-if="voiceBusy" style="margin-top: 8px">Analisando...</p>
         <p class="error" v-if="voiceError">{{ voiceError }}</p>
         <div v-if="voice" style="margin-top: 10px" class="small">
@@ -337,6 +348,21 @@ function cssColor(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+async function blobToWav(blob) {
+  const context = new AudioContext({ sampleRate: 16000 });
+  const decoded = await context.decodeAudioData(await blob.arrayBuffer());
+  await context.close();
+  const samples = decoded.getChannelData(0);
+  const view = new DataView(new ArrayBuffer(44 + samples.length * 2));
+  const text = (offset, value) => [...value].forEach((c, i) => view.setUint8(offset + i, c.charCodeAt(0)));
+  text(0, 'RIFF'); view.setUint32(4, 36 + samples.length * 2, true); text(8, 'WAVE'); text(12, 'fmt ');
+  view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, 16000, true); view.setUint32(28, 32000, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  text(36, 'data'); view.setUint32(40, samples.length * 2, true);
+  samples.forEach((s, i) => view.setInt16(44 + i * 2, Math.max(-1, Math.min(1, s)) * 0x7fff, true));
+  return new File([view], `gravacao_${new Date().toISOString().slice(11, 19).replace(/:/g, '')}.wav`, { type: 'audio/wav' });
+}
+
 async function api(url, options) {
   const response = await fetch(url, options);
   const body = await response.json().catch(() => ({}));
@@ -351,7 +377,7 @@ Vue.createApp({
     return {
       tab: 'internacao', status: null, loadError: '', stays: [], suggested: null, stayId: null, speed: 0.25,
       running: false, vitals: VITALS, hours: [], series: {}, vitalEvents: [], rxEvents: [], risk: null, report: '',
-      gait: null, gaitBusy: false, gaitError: '', voice: null, voiceBase: null, voiceBusy: false, voiceError: '',
+      gait: null, gaitBusy: false, gaitError: '', voice: null, voiceBase: null, recording: null, recorder: null, recTimer: null, recSeconds: 0, voiceBusy: false, voiceError: '',
       surgery: null, surgeryInfo: null, surgeryVideo: null, surgeryClip: '', surgeryBusy: false, surgeryError: '',
       alerts: [], responsible: '', alertError: '',
     };
@@ -535,6 +561,10 @@ Vue.createApp({
     async sendFile(event, url, field, busy, errorField, baseFile = null) {
       const file = event.target.files[0];
       if (!file) return;
+      await this.sendBlob(file, url, field, busy, errorField, baseFile);
+      event.target.value = '';
+    },
+    async sendBlob(file, url, field, busy, errorField, baseFile = null) {
       const form = new FormData();
       form.append('arquivo', file);
       if (baseFile) form.append('base', baseFile);
@@ -546,7 +576,43 @@ Vue.createApp({
         this[errorField] = error.message;
       } finally {
         this[busy] = false;
-        event.target.value = '';
+      }
+    },
+    // Gravação pelo microfone. O navegador grava em webm/ogg; aqui vira WAV 16 kHz mono, que é o que o servidor aceita.
+    async toggleRecording(kind) {
+      if (this.recording) {
+        this.recorder.stop();
+        return;
+      }
+      this.voiceError = '';
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false } });
+        const chunks = [];
+        const recorder = new MediaRecorder(stream);
+        recorder.ondataavailable = (e) => chunks.push(e.data);
+        recorder.onstop = async () => {
+          clearInterval(this.recTimer);
+          stream.getTracks().forEach((track) => track.stop());
+          this.recording = null;
+          try {
+            const wav = await blobToWav(new Blob(chunks, { type: recorder.mimeType }));
+            if (kind === 'base') {
+              this.voiceBase = wav;
+            } else {
+              await this.sendBlob(wav, `/api/v1/pacientes/${this.stayId}/voz`, 'voice', 'voiceBusy', 'voiceError', this.voiceBase);
+            }
+          } catch (error) {
+            this.voiceError = 'Não foi possível processar a gravação: ' + error.message;
+          }
+        };
+        this.recorder = recorder;
+        this.recording = kind;
+        this.recSeconds = 0;
+        this.recTimer = setInterval(() => { this.recSeconds += 1; }, 1000);
+        recorder.start();
+      } catch (error) {
+        this.recording = null;
+        this.voiceError = 'Não foi possível acessar o microfone: ' + error.message;
       }
     },
     gaitUpload(event) { return this.sendFile(event, `/api/v1/pacientes/${this.stayId}/marcha`, 'gait', 'gaitBusy', 'gaitError'); },

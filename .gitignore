@@ -17,3 +17,7 @@ backend/yolov8n.pt
 *.npz
 **/endoscapes*/
 **/tame-pain*/
+
+.venv/
+backend/uv.out
+backend/uv.err
