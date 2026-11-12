@@ -2,7 +2,7 @@
 
 Sistema de monitoramento hospitalar multimodal do Tech Challenge da Fase 4 (Pós-Tech IA para Devs, FIAP). É um protótipo acadêmico, sem validação clínica, para apoio à decisão.
 
-O guia completo, escrito para quem está começando, está em [docs/Guia_do_Projeto_OmniCare.docx](docs/Guia_do_Projeto_OmniCare.docx).
+O **relatório técnico** (fluxo multimodal, modelos por tipo de dado, resultados e exemplos de anomalias) está em [docs/Relatorio_Tecnico.md](docs/Relatorio_Tecnico.md). O guia completo, escrito para quem está começando, está em [docs/Guia_do_Projeto_OmniCare.docx](docs/Guia_do_Projeto_OmniCare.docx).
 
 ## 1. Fluxo multimodal
 
@@ -11,28 +11,30 @@ O guia completo, escrito para quem está começando, está em [docs/Guia_do_Proj
 | Sinais vitais em série temporal | MIMIC-IV Demo 2.2 | Comparação com as 24 h anteriores do próprio paciente | Pronto |
 | Prescrições | MIMIC-IV Demo 2.2 | Mudanças fortes de dose e inícios tardios | Pronto |
 | Marcha (esqueleto de sensores) | Multi-Gait-Posture | 13 medidas e pontuação z robusta | Pronto |
-| Marcha (vídeo) | Vídeo do grupo | MediaPipe Pose e a mesma referência | Código pronto, sem validação com vídeo real |
-| Voz (som) | TAME Pain | Medidas acústicas e regressão logística | Pronto; falta testar com gravação em português |
-| Fala (conteúdo) | Consulta gravada pelo grupo | Azure Speech to Text e Azure Text Analytics | Código pronto, faltam chaves e teste |
+| Marcha (vídeo) | Vídeo enviado | MediaPipe Pose e a mesma referência | Código pronto, sem validação com vídeo real |
+| Voz (som) | TAME Pain | Medidas acústicas e regressão logística | Pronto; não validado em português |
+| Fala (conteúdo) | Consulta gravada ou falada no microfone | Azure Speech to Text e Azure Language, com lista de sintomas e negação | Pronto e testado com o Azure |
 | Vídeo de cirurgia | Endoscapes2023 | YOLOv8s e ResNet18, um frame a cada 5 segundos | Pronto, com as limitações descritas na seção 4 |
 
 Cada resultado da internação entra em uma pontuação de risco que mostra o motivo de cada ponto. Quando o risco sobe, o sistema grava um alerta com laudo, e uma pessoa da equipe confirma que viu. Um indício de desvio na cirurgia gera um alerta próprio, de nível atenção. Os pesos foram definidos pelo projeto.
 
 ## 2. Como executar
 
-Use Python 3.11. No PowerShell, na pasta do projeto:
+Use Python 3.11 ou 3.12 (a 3.13 e a 3.14 não funcionam com as versões fixadas de torch e mediapipe). No PowerShell, na pasta do projeto:
 
 ```powershell
-py -3.11 -m venv venv
-venv\Scripts\activate
+py -3.12 -m venv backend\.venv
+backend\.venv\Scripts\activate
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --port 8000
 ```
 
-Abra http://localhost:8000 no navegador.
+Abra http://localhost:8000 no navegador. A instalação baixa o PyTorch e leva alguns minutos.
 
-As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição. Para usá-las, preencha `backend/.env`, que nunca deve ir para o Git:
+### Azure (voz e fala)
+
+As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição e não inventa texto. Para usá-las, crie `backend/.env`, que nunca deve ir para o Git (ele já está no `.gitignore`):
 
 ```
 AZURE_SPEECH_KEY=
@@ -41,6 +43,16 @@ AZURE_SPEECH_LANGUAGE=pt-BR
 AZURE_LANGUAGE_KEY=
 AZURE_LANGUAGE_ENDPOINT=
 ```
+
+Use um recurso **Speech** (chave e região) e um recurso **Language** (chave e endpoint). O que o sistema faz com eles:
+
+* **Azure Speech to Text:** transcreve a consulta inteira em reconhecimento contínuo, em `pt-BR`. O áudio é regravado em WAV PCM 16 kHz mono antes do envio.
+* **Azure Language:** sentimento e frases-chave. Textos longos são divididos em blocos de 4.000 caracteres (o serviço aceita até 5.120).
+* **Sintomas:** uma lista própria separa sintomas **graves** (geram alerta: falta de ar, dor no peito, tontura, desmaio e outros) de queixas **leves** (só aparecem na tela: cansaço, tosse, dor de cabeça e outras). Termos negados ("não tenho falta de ar") são ignorados.
+
+### Voz e fala na tela
+
+Na seção "Voz e fala" é possível enviar um `.wav` ou gravar direto pelo microfone (o navegador pede permissão; use `localhost`). Para o sinal vocal somar pontos de risco, grave antes uma amostra em repouso da mesma pessoa, com ao menos 5 frases e uma pausa de cerca de 1 segundo entre elas. A análise da consulta começa ao parar a gravação ou ao escolher o arquivo.
 
 ### Modelos de cirurgia
 
@@ -55,6 +67,8 @@ cd backend
 pip install -r requirements-dev.txt
 python -m pytest tests
 ```
+
+A suíte leva cerca de 3 minutos.
 
 ## 4. Resultados
 
