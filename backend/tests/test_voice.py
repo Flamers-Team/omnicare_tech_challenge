@@ -6,7 +6,8 @@ import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
-import main
+from app import config, deps
+from app.main import app as fastapi_app
 from services.alert_service import AlertStore, combined_risk
 from services.report_service import inpatient_report
 from services.voice_features import SAMPLE_RATE, calibrate_features, extract_voice_features, split_utterances
@@ -104,9 +105,9 @@ def test_audio_without_speech_is_not_evaluated(tmp_path):
 
 
 def test_real_model_loads_and_gives_a_score():
-    if not main.voice_signal_service.available():
+    if not deps.voice_signal_service.available():
         pytest.skip("modelo de voz não está nesta máquina")
-    result = main.voice_signal_service.assess(recording(3), recording(6))
+    result = deps.voice_signal_service.assess(recording(3), recording(6))
     assert result["avaliado"] and 0 <= result["pontuacao"] <= 1 and result["frases"] == 3 and result["frases_em_repouso"] == 6
 
 
@@ -126,17 +127,17 @@ def test_report_says_it_is_not_a_pain_score():
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    monkeypatch.setattr(main, "alerts", AlertStore(tmp_path / "alertas.db"))
-    monkeypatch.setattr(main, "UPLOAD_DIR", tmp_path / "envios")
-    monkeypatch.setattr(main, "patient_context", {})
-    monkeypatch.setattr(main.audio_service, "speech_key", "")
-    monkeypatch.setattr(main.audio_service, "lang_key", "")
-    return TestClient(main.app)
+    monkeypatch.setattr(deps, "alerts", AlertStore(tmp_path / "alertas.db"))
+    monkeypatch.setattr(config, "UPLOAD_DIR", tmp_path / "envios")
+    monkeypatch.setattr(deps, "patient_context", {})
+    monkeypatch.setattr(deps.audio_service, "speech_key", "")
+    monkeypatch.setattr(deps.audio_service, "lang_key", "")
+    return TestClient(fastapi_app)
 
 
 def test_route_with_baseline_adds_the_voice_point_and_removes_both_files(client, tmp_path, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "voice_signal", service_with(tmp_path))
-    stay = main.clinical_service.suggested_stay()
+    monkeypatch.setattr(deps.audio_service, "voice_signal", service_with(tmp_path))
+    stay = deps.clinical_service.suggested_stay()
     response = client.post(
         f"/api/v1/pacientes/{stay}/voz",
         files={"arquivo": ("consulta.wav", wav_bytes(recording(2)), "audio/wav"), "base": ("repouso.wav", wav_bytes(recording(6)), "audio/wav")},
@@ -146,34 +147,34 @@ def test_route_with_baseline_adds_the_voice_point_and_removes_both_files(client,
     assert data["resultado"]["sinal_vocal"]["soma_no_risco"] is True
     assert "voz" in {reason["fonte"] for reason in data["risco"]["motivos"]}
     assert "não é nota de dor" in data["laudo"]
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_route_refuses_short_baseline_and_removes_both_files(client, tmp_path, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "voice_signal", service_with(tmp_path))
-    stay = main.clinical_service.suggested_stay()
+    monkeypatch.setattr(deps.audio_service, "voice_signal", service_with(tmp_path))
+    stay = deps.clinical_service.suggested_stay()
     response = client.post(
         f"/api/v1/pacientes/{stay}/voz",
         files={"arquivo": ("consulta.wav", wav_bytes(recording(2)), "audio/wav"), "base": ("repouso.wav", wav_bytes(recording(2)), "audio/wav")},
     )
     assert response.status_code == 422 and "ao menos 5" in response.json()["detail"]
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_route_refuses_a_baseline_of_the_wrong_type(client, tmp_path, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "voice_signal", service_with(tmp_path))
-    stay = main.clinical_service.suggested_stay()
+    monkeypatch.setattr(deps.audio_service, "voice_signal", service_with(tmp_path))
+    stay = deps.clinical_service.suggested_stay()
     response = client.post(
         f"/api/v1/pacientes/{stay}/voz",
         files={"arquivo": ("consulta.wav", wav_bytes(recording(2)), "audio/wav"), "base": ("repouso.mp3", b"x", "audio/mpeg")},
     )
     assert response.status_code == 400
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_file_name_does_not_change_the_result(client, tmp_path, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "voice_signal", service_with(tmp_path, raw=0.2))
-    stay = main.clinical_service.suggested_stay()
+    monkeypatch.setattr(deps.audio_service, "voice_signal", service_with(tmp_path, raw=0.2))
+    stay = deps.clinical_service.suggested_stay()
     audio = wav_bytes(recording(2))
     results = [client.post(f"/api/v1/pacientes/{stay}/voz", files={"arquivo": (name, audio, "audio/wav")}).json()["resultado"]["sinal_vocal"] for name in ("p01.LC.06.wav", "p01.LW.06.wav")]
     assert results[0] == results[1]

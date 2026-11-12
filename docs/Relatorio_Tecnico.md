@@ -256,7 +256,7 @@ py -3.12 -m venv backend\.venv
 backend\.venv\Scripts\activate
 pip install -r backend\requirements.txt
 cd backend
-uvicorn main:app --port 8000
+uvicorn app.main:app --port 8000
 python -m pytest tests
 ```
 

@@ -9,13 +9,14 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-import main
+from app import config, deps
+from app.main import app as fastapi_app
 from services.alert_service import AlertStore
 from services.report_service import surgery_report
 from services.surgery_video_service import CVS_FILE, DETECTOR_FILE, RULE_FILE, SurgeryVideoAnalyzer
 
 SCENE = {"gallbladder", "tool"}
-RULE = json.loads((main.BASE_DIR / "models" / RULE_FILE).read_text(encoding="utf-8"))
+RULE = json.loads((config.BASE_DIR / "models" / RULE_FILE).read_text(encoding="utf-8"))
 C2, C3 = RULE["limiares"]["C2"], RULE["limiares"]["C3"]
 
 
@@ -153,19 +154,19 @@ def test_dataset_without_zip_lists_nothing(tmp_path):
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    monkeypatch.setattr(main, "alerts", AlertStore(tmp_path / "alertas.db"))
-    monkeypatch.setattr(main, "UPLOAD_DIR", tmp_path / "envios")
-    return TestClient(main.app)
+    monkeypatch.setattr(deps, "alerts", AlertStore(tmp_path / "alertas.db"))
+    monkeypatch.setattr(config, "UPLOAD_DIR", tmp_path / "envios")
+    return TestClient(fastapi_app)
 
 
 def use(monkeypatch, tmp_path, table, **options):
     models = tmp_path / "modelos"
     models.mkdir()
-    monkeypatch.setattr(main, "surgery_service", FakeAnalyzer(models, table, **options))
+    monkeypatch.setattr(deps, "surgery_service", FakeAnalyzer(models, table, **options))
 
 
 def test_info_route_shows_test_performance_and_is_honest_without_models(client, tmp_path, monkeypatch):
-    monkeypatch.setattr(main, "surgery_service", SurgeryVideoAnalyzer(main.BASE_DIR / "models", tmp_path / "nao_existe.zip"))
+    monkeypatch.setattr(deps, "surgery_service", SurgeryVideoAnalyzer(config.BASE_DIR / "models", tmp_path / "nao_existe.zip"))
     monkeypatch.setattr(SurgeryVideoAnalyzer, "models_available", lambda self: False)
     data = client.get("/api/v1/cirurgia").json()
     assert data["modelos_ativos"] is False and data["videos_base"] == []
@@ -208,7 +209,7 @@ def test_upload_keeps_no_file_returns_no_image_and_uses_clip_moment(client, tmp_
     data = response.json()
     assert data["resultado"]["frames_analisados"] == 3
     assert data["alerta"]["paciente"] == "Cirurgia, cirurgia.mp4"
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
     text = response.text.lower()
     assert "base64" not in text and "image" not in text and ".jpg" not in text
 
@@ -223,13 +224,13 @@ def test_broken_upload_returns_422_and_is_removed(client, tmp_path, monkeypatch)
     use(monkeypatch, tmp_path, REACHED)
     response = client.post("/api/v1/cirurgia/video", files={"arquivo": ("a.mp4", b"nao e video", "video/mp4")})
     assert response.status_code == 422
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
-@pytest.mark.skipif(not SurgeryVideoAnalyzer(main.BASE_DIR / "models").models_available(), reason="pesos treinados não estão nesta máquina")
+@pytest.mark.skipif(not SurgeryVideoAnalyzer(config.BASE_DIR / "models").models_available(), reason="pesos treinados não estão nesta máquina")
 def test_real_models_refuse_a_blank_video(tmp_path):
     path = tmp_path / "branco.mp4"
     write_video(path, 31)
-    result = SurgeryVideoAnalyzer(main.BASE_DIR / "models").analyze_video(path)
+    result = SurgeryVideoAnalyzer(config.BASE_DIR / "models").analyze_video(path)
     assert result["frames_analisados"] == 7
     assert result["avaliada"] is False and "colecistectomia" in result["motivo"]

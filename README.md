@@ -27,14 +27,14 @@ py -3.12 -m venv backend\.venv
 backend\.venv\Scripts\activate
 cd backend
 pip install -r requirements.txt
-uvicorn main:app --port 8000
+uvicorn app.main:app --port 8000
 ```
 
 Abra http://localhost:8000 no navegador. A instalação baixa o PyTorch e leva alguns minutos.
 
 ### Azure (voz e fala)
 
-As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição e não inventa texto. Para usá-las, crie `backend/.env`, que nunca deve ir para o Git (ele já está no `.gitignore`):
+As chaves do Azure são opcionais para rodar a demonstração. Sem elas, o sistema informa que não há transcrição e não inventa texto. Para usá-las, copie `backend/.env.example` para `backend/.env` e preencha. O `.env` que nunca deve ir para o Git (ele já está no `.gitignore`):
 
 ```
 AZURE_SPEECH_KEY=

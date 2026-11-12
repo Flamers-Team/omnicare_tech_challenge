@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -142,7 +142,7 @@ class AlertStore:
                     report,
                     occurred_at,
                     origin,
-                    datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                    datetime.now(UTC).isoformat(timespec="seconds"),
                 ),
             )
             row = self._db.execute(
@@ -162,7 +162,7 @@ class AlertStore:
         with self._lock, self._db:
             self._db.execute(
                 "UPDATE alertas SET confirmado_por = ?, confirmado_em = ? WHERE id = ? AND confirmado_por IS NULL",
-                (responsible, datetime.now(timezone.utc).isoformat(timespec="seconds"), alert_id),
+                (responsible, datetime.now(UTC).isoformat(timespec="seconds"), alert_id),
             )
             row = self._db.execute("SELECT * FROM alertas WHERE id = ?", (alert_id,)).fetchone()
             self.version += 1

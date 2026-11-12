@@ -8,8 +8,8 @@ import io
 import json
 import threading
 import zipfile
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Iterable, Iterator
 
 import numpy as np
 import pandas as pd

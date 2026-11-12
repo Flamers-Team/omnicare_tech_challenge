@@ -6,21 +6,22 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-import main
+from app import config, deps
+from app.main import app as fastapi_app
 from services.alert_service import AlertStore
 
 
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
-    monkeypatch.setattr(main, "alerts", AlertStore(tmp_path / "alertas.db"))
-    monkeypatch.setattr(main, "UPLOAD_DIR", tmp_path / "envios")
-    monkeypatch.setattr(main, "patient_context", {})
-    return TestClient(main.app)
+    monkeypatch.setattr(deps, "alerts", AlertStore(tmp_path / "alertas.db"))
+    monkeypatch.setattr(config, "UPLOAD_DIR", tmp_path / "envios")
+    monkeypatch.setattr(deps, "patient_context", {})
+    return TestClient(fastapi_app)
 
 
 @pytest.fixture()
 def stay_id():
-    return main.clinical_service.suggested_stay()
+    return deps.clinical_service.suggested_stay()
 
 
 def wav_bytes(seconds=1.0):
@@ -47,11 +48,11 @@ def test_home_page_is_served(client):
 
 
 def test_status_is_honest_about_what_is_not_connected(client, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "speech_key", "")
+    monkeypatch.setattr(deps.audio_service, "speech_key", "")
     status = client.get("/api/v1/status").json()
     assert status["marcha"]["ativo"] and status["sinais_vitais_prescricoes"]["ativo"]
     assert not status["azure_speech"]["ativo"]
-    monkeypatch.setattr(main.voice_signal_service, "model_path", main.BASE_DIR / "nao_existe.joblib")
+    monkeypatch.setattr(deps.voice_signal_service, "model_path", config.BASE_DIR / "nao_existe.joblib")
     assert not client.get("/api/v1/status").json()["sinal_vocal"]["ativo"]
 
 
@@ -103,25 +104,25 @@ def test_unknown_example_is_404(client, stay_id):
 
 
 def test_gait_csv_upload_runs_and_removes_temp_file(client, stay_id):
-    content = (main.GAIT_EXAMPLES["normal"]).read_bytes()
+    content = (config.GAIT_EXAMPLES["normal"]).read_bytes()
     import gzip
     response = client.post(f"/api/v1/pacientes/{stay_id}/marcha", files={"arquivo": ("meu.csv", gzip.decompress(content), "text/csv")})
     assert response.status_code == 200
     assert response.json()["resultado"]["arquivo"] == "meu.csv"
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_invalid_csv_gets_clear_message_and_removes_temp_file(client, stay_id):
     response = client.post(f"/api/v1/pacientes/{stay_id}/marcha", files={"arquivo": ("ruim.csv", b"a,b\n1,2\n", "text/csv")})
     assert response.status_code == 422
     assert "colunas" in response.json()["detail"]
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_invalid_video_gets_clear_message(client, stay_id):
     response = client.post(f"/api/v1/pacientes/{stay_id}/marcha", files={"arquivo": ("ruim.mp4", b"nao e video", "video/mp4")})
     assert response.status_code == 422
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_path_traversal_name_stays_in_upload_dir(client, stay_id, tmp_path):
@@ -139,15 +140,15 @@ def test_wrong_extension_is_rejected(client, stay_id):
 
 
 def test_file_over_limit_is_rejected_and_removed(client, stay_id, monkeypatch):
-    monkeypatch.setattr(main, "MAX_CSV_BYTES", 10)
+    monkeypatch.setattr(config, "MAX_CSV_BYTES", 10)
     response = client.post(f"/api/v1/pacientes/{stay_id}/marcha", files={"arquivo": ("grande.csv", b"x" * 100, "text/csv")})
     assert response.status_code == 413
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_voice_without_azure_invents_nothing(client, stay_id, monkeypatch):
-    monkeypatch.setattr(main.audio_service, "speech_key", "")
-    monkeypatch.setattr(main.audio_service, "lang_key", "")
+    monkeypatch.setattr(deps.audio_service, "speech_key", "")
+    monkeypatch.setattr(deps.audio_service, "lang_key", "")
     # O nome não pode influenciar o resultado: a regra antiga olhava a letra C do arquivo.
     data = client.post(f"/api/v1/pacientes/{stay_id}/voz", files={"arquivo": ("p01.LC.06.wav", wav_bytes(), "audio/wav")}).json()
     result = data["resultado"]
@@ -155,13 +156,13 @@ def test_voice_without_azure_invents_nothing(client, stay_id, monkeypatch):
     assert result["alerta"] is False
     assert result["sinal_vocal"]["soma_no_risco"] is False
     assert not {"fala", "voz"} & {reason["fonte"] for reason in data["risco"]["motivos"]}
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_broken_audio_gets_clear_message(client, stay_id):
     response = client.post(f"/api/v1/pacientes/{stay_id}/voz", files={"arquivo": ("ruim.wav", b"nao e audio", "audio/wav")})
     assert response.status_code == 422
-    assert list(main.UPLOAD_DIR.iterdir()) == []
+    assert list(config.UPLOAD_DIR.iterdir()) == []
 
 
 def test_simulated_surgery_route_no_longer_exists(client):
