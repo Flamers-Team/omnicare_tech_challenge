@@ -107,6 +107,16 @@ python -m pytest tests_e2e
 
 Eles cobrem o carregamento sem erros e sem CDN, os cinco gráficos, o monitoramento em tempo real, o fluxo do alerta até a confirmação, o envio de áudio e a gravação pelo microfone, a troca de tema e a tela de celular.
 
+### CI/CD e hospedagem no Azure
+
+* **CI** (`.github/workflows/ci.yml`): a cada push e pull request roda ruff, os testes da API e dos serviços, os testes no navegador (Chromium do Playwright, sem chaves do Azure) e confere que a imagem Docker constrói.
+* **Deploy** (`deploy.yml`, manual): constrói a imagem, envia para o Azure Container Registry, aponta o App Service para ela e faz um teste de fumaça em `/api/v1/status`.
+* **Start e stop** (`controle.yml`, manual): na aba Actions, escolha *status*, *start* ou *stop*. Parar o app **não** para a cobrança do plano B1; para não pagar, apague o plano no portal.
+* **Configuração única do Azure:** `infra/azure-setup.sh`, rodado no Cloud Shell. Cria o registry, as permissões e as configurações do app, e pede as chaves do Azure sem exibi-las.
+* O login do GitHub no Azure é por OIDC, sem senha guardada. No GitHub ficam os segredos `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` e `AZURE_SUBSCRIPTION_ID` e a variável `ACR_NAME`.
+* A imagem usa PyTorch só para CPU. Build local: `docker build -t omnicare .` e `docker run -p 8000:8000 omnicare`.
+* O app não tem autenticação. Se for exposto, restrinja o acesso por IP ou pelo login do Entra no próprio App Service.
+
 ## 4. Resultados
 
 Os arquivos completos estão em `training/resultados/`. As anomalias de sinais vitais, prescrições e marcha são simuladas sobre dados reais, então esses números são testes de engenharia e não medem acerto clínico.

@@ -58,9 +58,10 @@ def server(tmp_path_factory):
 @pytest.fixture(scope="session")
 def browser():
     with sync_playwright() as playwright:
-        # Usa o Edge instalado no Windows, sem baixar outro navegador. O microfone é simulado pelo próprio Chromium.
+        # Local (Windows): usa o Edge instalado, sem baixar outro navegador.
+        # No GitHub Actions: E2E_BROWSER_CHANNEL="" usa o Chromium do Playwright. O microfone é simulado pelo Chromium.
         instance = playwright.chromium.launch(
-            channel="msedge",
+            channel=os.getenv("E2E_BROWSER_CHANNEL", "msedge") or None,
             args=["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
         )
         yield instance

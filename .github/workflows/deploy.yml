@@ -1,0 +1,68 @@
+name: Deploy no Azure
+
+# Manual de propósito: um push na main não pode gastar nuvem sem você querer.
+# Rode a partir da branch main (o login no Azure só aceita a main).
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # login no Azure por OIDC, sem senha guardada
+  contents: read
+
+env:
+  RESOURCE_GROUP: RG_IA
+  WEBAPP_NAME: omnicare
+  ACR_NAME: ${{ vars.ACR_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login no Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login no registry
+        run: az acr login --name "$ACR_NAME"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build e envio da imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/omnicare:${{ github.sha }}
+            ${{ env.ACR_NAME }}.azurecr.io/omnicare:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Apontar o App Service para a nova imagem
+        run: |
+          az webapp config container set \
+            --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME" \
+            --container-image-name "$ACR_NAME.azurecr.io/omnicare:${{ github.sha }}" \
+            --container-registry-url "https://$ACR_NAME.azurecr.io"
+          az webapp restart --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME"
+
+      - name: Teste de fumaça
+        run: |
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$WEBAPP_NAME" --query defaultHostName -o tsv)
+          echo "Aguardando https://$HOST ..."
+          for i in $(seq 1 40); do
+            if curl -fsS "https://$HOST/api/v1/status" > status.json; then
+              echo "OK"; cat status.json
+              echo "### Deploy concluído" >> "$GITHUB_STEP_SUMMARY"
+              echo "https://$HOST" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "O app não respondeu a tempo"; exit 1
