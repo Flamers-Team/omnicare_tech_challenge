@@ -54,6 +54,12 @@ Use um recurso **Speech** (chave e região) e um recurso **Language** (chave e e
 
 Na seção "Voz e fala" é possível enviar um `.wav` ou gravar direto pelo microfone (o navegador pede permissão; use `localhost`). Para o sinal vocal somar pontos de risco, grave antes uma amostra em repouso da mesma pessoa, com ao menos 5 frases e uma pausa de cerca de 1 segundo entre elas. A análise da consulta começa ao parar a gravação ou ao escolher o arquivo.
 
+### Limpar os alertas de teste (antes de gravar uma demonstração)
+
+Na aba **Alertas**, o cartão "Vai gravar uma demonstração?" tem o botão **Limpar alertas de teste…**. Ele abre uma janela de confirmação que mostra quantos alertas serão apagados e oferece esquecer também a marcha e a fala analisadas na sessão (o risco da internação volta ao estado inicial). A limpeza não toca nos dados clínicos da base (sinais vitais e prescrições) e não pode ser desfeita.
+
+Pela API: `DELETE /api/v1/alertas` (só os alertas) ou `DELETE /api/v1/alertas?incluir_resultados=true` (alertas e resultados guardados). Em um ambiente publicado e sem login, desligue a função com a variável `OMNICARE_ALLOW_RESET=false`: o botão some e a API responde 403.
+
 ### Modelos de cirurgia
 
 Os pesos `endoscapes_yolov8s.pt` e `cvs_resnet18.pt` ficam em `backend/models/`. Eles foram gerados com `training/omnicare_endoscapes_colab.ipynb` a partir de uma base de licença restrita, mas não contêm os frames. Sem eles, a aba de cirurgia mostra as métricas e a análise fica desligada.

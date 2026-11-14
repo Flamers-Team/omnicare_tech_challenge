@@ -144,3 +144,71 @@ def test_no_horizontal_scroll_on_phone(browser, server):
     page.wait_for_timeout(1000)
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
     context.close()
+
+
+def make_test_alert(page):
+    """Gera um alerta de teste pela marcha alterada e espera ele chegar à aba Alertas."""
+    expect(page.get_by_test_id("kpi-level")).not_to_have_text("–")
+    page.get_by_role("button", name=re.compile("Tronco 20")).click()
+    expect(page.get_by_test_id("gait-result")).to_contain_text("Fora da referência")
+    expect(page.locator(".badge-count")).to_be_visible()
+
+
+def test_clear_alerts_is_visible_and_explains_itself(page):
+    make_test_alert(page)
+    page.get_by_role("tab", name=re.compile("Alertas")).click()
+    # O usuário vê, sem procurar, que pode limpar e o que isso afeta.
+    expect(page.get_by_role("heading", name="Vai gravar uma demonstração?")).to_be_visible()
+    expect(page.get_by_text("não apaga")).to_be_visible()
+    expect(page.get_by_test_id("open-clear")).to_be_visible()
+
+
+def test_clear_alerts_cancel_keeps_everything(page):
+    make_test_alert(page)
+    page.get_by_role("tab", name=re.compile("Alertas")).click()
+    total = alert_total(page)
+    page.get_by_test_id("open-clear").click()
+    dialog = page.get_by_test_id("clear-dialog")
+    expect(dialog).to_be_visible()
+    expect(dialog).to_contain_text("não pode ser desfeita")
+    page.get_by_test_id("clear-cancel").click()
+    expect(dialog).not_to_be_visible()
+    assert alert_total(page) == total and total >= 1
+
+
+def test_clear_alerts_removes_alerts_and_forgets_results(page):
+    make_test_alert(page)
+    page.get_by_role("tab", name=re.compile("Alertas")).click()
+    page.get_by_test_id("open-clear").click()
+    expect(page.get_by_test_id("clear-dialog")).to_contain_text("Esquecer também a marcha e a fala")
+    page.get_by_test_id("clear-confirm").click()
+
+    expect(page.get_by_test_id("clear-result")).to_contain_text("apagado")
+    expect(page.get_by_test_id("alert-card")).to_have_count(0)
+    expect(page.locator(".badge-count")).to_have_count(0)
+    assert alert_total(page) == 0
+    # O resultado da marcha também foi esquecido, e o risco voltou ao estado inicial.
+    page.get_by_role("tab", name=re.compile("Internação")).click()
+    expect(page.get_by_test_id("kpi-level")).not_to_have_text("–")
+    expect(page.get_by_test_id("gait-result")).to_have_count(0)
+
+
+def test_clear_alerts_can_keep_analysis_results(page):
+    make_test_alert(page)
+    page.get_by_role("tab", name=re.compile("Alertas")).click()
+    page.get_by_test_id("open-clear").click()
+    page.get_by_label("Esquecer também a marcha e a fala").uncheck()
+    page.get_by_test_id("clear-confirm").click()
+    expect(page.get_by_test_id("alert-card")).to_have_count(0)
+    page.get_by_role("tab", name=re.compile("Internação")).click()
+    expect(page.get_by_test_id("gait-result")).to_contain_text("Fora da referência")
+
+
+def test_clear_alerts_is_hidden_when_the_server_disables_it(page):
+    page.route("**/api/v1/status", lambda route: route.fulfill(
+        json={**route.fetch().json(), "limpeza_permitida": False}))
+    page.reload()
+    page.wait_for_selector(".status-strip .pill")
+    page.get_by_role("tab", name=re.compile("Alertas")).click()
+    expect(page.get_by_role("heading", name="Histórico de alertas")).to_be_visible()
+    expect(page.get_by_test_id("open-clear")).to_have_count(0)

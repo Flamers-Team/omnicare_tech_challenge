@@ -56,6 +56,45 @@ def test_status_is_honest_about_what_is_not_connected(client, monkeypatch):
     assert not client.get("/api/v1/status").json()["sinal_vocal"]["ativo"]
 
 
+def test_clear_alerts_keeps_analysis_results_by_default(client, stay_id):
+    client.post(f"/api/v1/pacientes/{stay_id}/marcha/exemplo/alterada")
+    assert len(client.get("/api/v1/alertas").json()["alertas"]) == 1
+
+    response = client.delete("/api/v1/alertas")
+    assert response.status_code == 200
+    assert response.json() == {"alertas_apagados": 1, "resultados_limpos": False}
+    assert client.get("/api/v1/alertas").json()["alertas"] == []
+    # O resultado da marcha continua guardado, então o risco continua o mesmo.
+    timeline = client.get(f"/api/v1/pacientes/{stay_id}/linha-do-tempo").json()
+    assert timeline["marcha"] is not None and timeline["risco"]["nivel"] != "baixo"
+
+
+def test_clear_alerts_can_also_forget_analysis_results(client, stay_id):
+    client.post(f"/api/v1/pacientes/{stay_id}/marcha/exemplo/alterada")
+    response = client.delete("/api/v1/alertas?incluir_resultados=true")
+    assert response.json() == {"alertas_apagados": 1, "resultados_limpos": True}
+    timeline = client.get(f"/api/v1/pacientes/{stay_id}/linha-do-tempo").json()
+    assert timeline["marcha"] is None and timeline["fala"] is None
+    assert timeline["eventos_sinais_vitais"]  # os dados clínicos da base continuam lá
+
+
+def test_clear_alerts_on_empty_history_is_fine(client):
+    assert client.delete("/api/v1/alertas").json()["alertas_apagados"] == 0
+
+
+def test_clear_alerts_can_be_disabled(client, stay_id, monkeypatch):
+    client.post(f"/api/v1/pacientes/{stay_id}/marcha/exemplo/alterada")
+    monkeypatch.setattr(config, "ALLOW_RESET", False)
+    assert client.get("/api/v1/status").json()["limpeza_permitida"] is False
+    response = client.delete("/api/v1/alertas")
+    assert response.status_code == 403
+    assert len(client.get("/api/v1/alertas").json()["alertas"]) == 1  # nada foi apagado
+
+
+def test_status_says_clearing_is_allowed_by_default(client):
+    assert client.get("/api/v1/status").json()["limpeza_permitida"] is True
+
+
 def test_unknown_stay_is_404(client):
     assert client.get("/api/v1/pacientes/1/linha-do-tempo").status_code == 404
     assert client.get("/api/v1/pacientes/1/monitor").status_code == 404

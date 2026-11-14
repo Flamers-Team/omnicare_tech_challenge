@@ -107,6 +107,19 @@ export function connectAlerts() {
   };
 }
 
+/** Apaga o histórico de alertas. Com `includeResults`, esquece também a marcha e a fala analisadas. */
+export async function clearAlerts(includeResults) {
+  const result = await api(`/api/v1/alertas?incluir_resultados=${includeResults}`, { method: "DELETE" });
+  store.alerts = [];
+  store.toasts.splice(0);
+  if (includeResults) {
+    store.gait = null;
+    store.voice = null;
+    await loadTimeline(); // o risco e o laudo voltam ao estado inicial
+  }
+  return result;
+}
+
 function pushToast(alert) {
   // Mostra o motivo que mais pesou no risco.
   const main = [...(alert.motivos ?? [])].sort((a, b) => b.pontos - a.pontos)[0];

@@ -32,6 +32,14 @@
 .card.accent-ok { border-left: 5px solid var(--ok); }
 .card.accent-warn { border-left: 5px solid var(--warn); }
 .card.accent-crit { border-left: 5px solid var(--crit); }
+.card.accent-info { border-left: 5px solid var(--accent); }
+
+/* ---------- Janela de confirmação ---------- */
+.dialog { width: min(460px, calc(100vw - 32px)); padding: 22px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-lg); }
+.dialog::backdrop { background: rgba(15, 23, 42, .55); }
+.dialog .check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); cursor: pointer; font-size: 14px; }
+.dialog .check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--accent); }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
 
 /* ---------- Botões e campos ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); font-weight: 500; font-size: 14px; transition: background .15s, border-color .15s, transform .05s; }
@@ -40,7 +48,7 @@
 .btn:disabled { opacity: .55; cursor: not-allowed; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.08); }
-.btn.danger { background: var(--crit); border-color: var(--crit); color: #fff; }
+.btn.danger { background: var(--crit); border-color: var(--crit); color: var(--accent-ink); }
 .btn.danger:hover:not(:disabled) { background: var(--crit); filter: brightness(1.08); }
 .btn.sm { padding: 6px 10px; font-size: 13px; }
 .field { display: grid; gap: 4px; min-width: 0; }

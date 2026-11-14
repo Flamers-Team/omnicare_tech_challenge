@@ -70,6 +70,8 @@ def browser():
 
 @pytest.fixture()
 def page(browser, server):
+    # Cada teste começa sem alertas nem análises guardadas, porque o servidor é compartilhado entre eles.
+    urllib.request.urlopen(urllib.request.Request(f"{server}/api/v1/alertas?incluir_resultados=true", method="DELETE"), timeout=30).read()
     context = browser.new_context(viewport={"width": 1366, "height": 900}, permissions=["microphone"])
     page = context.new_page()
     page.errors = []

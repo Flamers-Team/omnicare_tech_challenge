@@ -15,6 +15,20 @@ def list_alerts():
     return {"alertas": deps.alerts.list()}
 
 
+@router.delete("")
+def clear_alerts(incluir_resultados: bool = False):
+    """Apaga o histórico de alertas. Com `incluir_resultados`, também esquece a marcha e a fala analisadas em cada internação.
+
+    Os dados clínicos (sinais vitais e prescrições da base) nunca são tocados.
+    """
+    if not config.ALLOW_RESET:
+        raise HTTPException(403, "A limpeza está desativada neste ambiente.")
+    deleted = deps.alerts.clear()
+    if incluir_resultados:
+        deps.patient_context.clear()
+    return {"alertas_apagados": deleted, "resultados_limpos": incluir_resultados}
+
+
 @router.get("/stream")
 async def alert_stream():
     async def stream():

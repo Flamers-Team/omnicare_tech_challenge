@@ -82,6 +82,29 @@ def test_same_moment_from_another_origin_is_a_new_alert(tmp_path):
     assert len(store.list()) == 2
 
 
+def test_clear_removes_everything_and_restarts_numbering(tmp_path):
+    store = AlertStore(tmp_path / "alertas.db")
+    risk = combined_risk([vital()], [], NOW)
+    store.add("Internação 1", risk, "laudo", "2150-01-02T12:00:00", "monitor")
+    store.add("Internação 1", risk, "laudo", "2150-01-02T12:00:00", "marcha")
+    version = store.version
+    assert store.count() == 2
+
+    assert store.clear() == 2
+    assert store.count() == 0 and store.list() == []
+    assert store.version > version  # quem acompanha em tempo real é avisado
+    assert store.add("Internação 1", risk, "laudo", "2150-01-02T12:00:00")["id"] == 1
+    assert store.clear() == 1 and store.clear() == 0
+
+
+def test_clear_is_permanent_after_restart(tmp_path):
+    path = tmp_path / "alertas.db"
+    store = AlertStore(path)
+    store.add("Internação 1", combined_risk([vital()], [], NOW), "laudo", "2150-01-02T12:00:00")
+    store.clear()
+    assert AlertStore(path).list() == []
+
+
 def test_history_survives_restart(tmp_path):
     path = tmp_path / "alertas.db"
     AlertStore(path).add("Internação 1", combined_risk([vital()], [], NOW), "laudo", "2150-01-02T12:00:00")

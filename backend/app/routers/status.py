@@ -14,4 +14,5 @@ def system_status():
         "azure_speech": {"ativo": deps.audio_service.speech_configured()},
         "azure_language": {"ativo": deps.audio_service.language_configured()},
         "cirurgia": {"ativo": deps.surgery_service.models_available()},
+        "limpeza_permitida": config.ALLOW_RESET,
     }

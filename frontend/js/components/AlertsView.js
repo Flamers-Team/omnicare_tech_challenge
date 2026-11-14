@@ -1,6 +1,6 @@
 import { ref } from "../vue.js";
 import { postJson } from "../api.js";
-import { store } from "../store.js";
+import { clearAlerts, store } from "../store.js";
 import { formatDate, levelName, levelTone, pointsLabel, sourceName } from "../format.js";
 
 export default {
@@ -19,8 +19,40 @@ export default {
         error.value = e.message;
       }
     }
+
+    // Limpeza do histórico de teste
+    const dialog = ref(null);
+    const includeResults = ref(true);
+    const clearing = ref(false);
+    const clearError = ref("");
+    const cleared = ref(null);
+
+    function openDialog() {
+      clearError.value = "";
+      includeResults.value = true;
+      dialog.value.showModal();
+    }
+    function closeDialog() {
+      dialog.value.close();
+    }
+    async function doClear() {
+      clearing.value = true;
+      clearError.value = "";
+      try {
+        cleared.value = await clearAlerts(includeResults.value);
+        closeDialog();
+      } catch (e) {
+        clearError.value = e.message;
+      } finally {
+        clearing.value = false;
+      }
+    }
+
     const accent = (level) => ({ ok: "accent-ok", warn: "accent-warn", crit: "accent-crit" })[levelTone(level)] ?? "";
-    return { store, responsible, error, confirm, accent, formatDate, levelName, levelTone, pointsLabel, sourceName };
+    return {
+      store, responsible, error, confirm, accent, formatDate, levelName, levelTone, pointsLabel, sourceName,
+      dialog, includeResults, clearing, clearError, cleared, openDialog, closeDialog, doClear,
+    };
   },
   template: `
     <div class="stack">
@@ -38,6 +70,48 @@ export default {
         <p class="notice error" v-if="error" role="alert" style="margin-top: 10px">{{ error }}</p>
         <p class="small muted" style="margin: 10px 0 0">As datas do MIMIC-IV são deslocadas pela própria base para proteger os pacientes.</p>
       </section>
+
+      <section class="card accent-info" v-if="store.status?.limpeza_permitida" aria-labelledby="demo-title">
+        <div class="card-head">
+          <div>
+            <h2 id="demo-title">Vai gravar uma demonstração?</h2>
+            <p class="small muted">Você pode apagar o histórico de alertas de teste e começar do zero.</p>
+          </div>
+          <button class="btn" @click="openDialog" data-testid="open-clear">Limpar alertas de teste…</button>
+        </div>
+        <p class="small" style="margin: 0">
+          Hoje há <strong data-testid="alert-count">{{ store.alerts.length }}</strong>
+          {{ store.alerts.length === 1 ? 'alerta guardado' : 'alertas guardados' }} neste servidor.
+          A limpeza <strong>não apaga</strong> os dados clínicos da base (sinais vitais e prescrições).
+        </p>
+        <p class="small" v-if="cleared" style="margin: 8px 0 0" role="status" data-testid="clear-result">
+          <span class="pill ok">pronto</span>
+          {{ cleared.alertas_apagados }} {{ cleared.alertas_apagados === 1 ? 'alerta apagado' : 'alertas apagados' }}{{ cleared.resultados_limpos ? ', e a marcha e a fala analisadas foram esquecidas' : '' }}.
+        </p>
+      </section>
+
+      <dialog ref="dialog" class="dialog" aria-labelledby="clear-title" data-testid="clear-dialog">
+        <h2 id="clear-title">Apagar os alertas de teste?</h2>
+        <p style="margin: 10px 0 0">
+          Serão apagados <strong>{{ store.alerts.length }}</strong> {{ store.alerts.length === 1 ? 'alerta' : 'alertas' }} do histórico.
+          <strong>Esta ação não pode ser desfeita.</strong>
+        </p>
+        <label class="check" for="include-results">
+          <input id="include-results" type="checkbox" v-model="includeResults" />
+          <span>
+            Esquecer também a marcha e a fala que foram analisadas nesta sessão
+            <span class="small muted" style="display: block">Recomendado antes de gravar: o risco da internação volta ao estado inicial.</span>
+          </span>
+        </label>
+        <p class="small muted" style="margin: 0">Os dados clínicos da base (sinais vitais e prescrições) não são afetados.</p>
+        <p class="notice error" v-if="clearError" role="alert" style="margin-top: 12px">{{ clearError }}</p>
+        <div class="dialog-actions">
+          <button class="btn" @click="closeDialog" :disabled="clearing" data-testid="clear-cancel">Cancelar</button>
+          <button class="btn danger" @click="doClear" :disabled="clearing" data-testid="clear-confirm">
+            <span class="spinner" v-if="clearing"></span> Apagar alertas
+          </button>
+        </div>
+      </dialog>
 
       <section class="card" :class="accent(alert.nivel)" v-for="alert in store.alerts" :key="alert.id" data-testid="alert-card">
         <div class="card-head">

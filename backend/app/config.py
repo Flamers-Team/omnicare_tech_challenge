@@ -22,5 +22,9 @@ MAX_VIDEO_BYTES = 500 * 1024 * 1024
 MAX_AUDIO_BYTES = 50 * 1024 * 1024
 ALERT_STREAM_SECONDS = 1.0
 
+# Permite apagar o histórico de alertas pela tela (útil antes de gravar uma demonstração).
+# Em um ambiente publicado, sem login, defina OMNICARE_ALLOW_RESET=false para desligar.
+ALLOW_RESET = os.getenv("OMNICARE_ALLOW_RESET", "true").strip().lower() not in {"0", "false", "no", "nao", "não"}
+
 # A base tem licença restrita e fica fora do projeto. Em outro computador, informe o caminho em ENDOSCAPES_ZIP.
 ENDOSCAPES_ZIP = os.getenv("ENDOSCAPES_ZIP") or Path.home() / "Downloads" / "endoscapes_omnicare.zip"

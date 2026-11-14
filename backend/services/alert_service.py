@@ -157,6 +157,19 @@ class AlertStore:
             rows = self._db.execute("SELECT * FROM alertas ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
         return [self._as_dict(row) for row in rows]
 
+    def count(self) -> int:
+        with self._lock:
+            return self._db.execute("SELECT COUNT(*) FROM alertas").fetchone()[0]
+
+    def clear(self) -> int:
+        """Apaga todo o histórico de alertas e devolve quantos eram. Os números voltam a começar do 1."""
+        with self._lock, self._db:
+            deleted = self._db.execute("SELECT COUNT(*) FROM alertas").fetchone()[0]
+            self._db.execute("DELETE FROM alertas")
+            self._db.execute("DELETE FROM sqlite_sequence WHERE name = 'alertas'")
+            self.version += 1  # avisa quem acompanha os alertas em tempo real
+        return deleted
+
     def confirm(self, alert_id: int, responsible: str) -> dict | None:
         """Registra quem viu o alerta. Devolve None se ele não existir; o primeiro registro é mantido."""
         with self._lock, self._db:
