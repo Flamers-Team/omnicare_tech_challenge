@@ -1,0 +1,62 @@
+name: Controle do ambiente (start / stop)
+
+# Liga, desliga ou consulta o app no Azure, quando você quiser.
+# Atenção: parar o app NÃO para a cobrança do plano B1. Para não pagar, apague o plano no portal.
+on:
+  workflow_dispatch:
+    inputs:
+      acao:
+        description: "O que fazer"
+        type: choice
+        required: true
+        default: status
+        options:
+          - status
+          - start
+          - stop
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: RG_IA
+  WEBAPP_NAME: omnicare
+
+jobs:
+  controle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Login no Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Executar
+        run: |
+          case "${{ inputs.acao }}" in
+            start) az webapp start --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME" ;;
+            stop)  az webapp stop  --resource-group "$RESOURCE_GROUP" --name "$WEBAPP_NAME" ;;
+          esac
+          STATE=$(az webapp show -g "$RESOURCE_GROUP" -n "$WEBAPP_NAME" --query state -o tsv)
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$WEBAPP_NAME" --query defaultHostName -o tsv)
+          echo "Estado: $STATE"
+          {
+            echo "### OmniCare AI: $STATE"
+            echo "https://$HOST"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Esperar o app responder (só no start)
+        if: ${{ inputs.acao == 'start' }}
+        run: |
+          HOST=$(az webapp show -g "$RESOURCE_GROUP" -n "$WEBAPP_NAME" --query defaultHostName -o tsv)
+          for i in $(seq 1 40); do
+            if curl -fsS "https://$HOST/api/v1/status" > /dev/null; then
+              echo "No ar: https://$HOST"; exit 0
+            fi
+            sleep 15
+          done
+          echo "O app não respondeu a tempo (o primeiro start carrega os modelos e pode demorar)"; exit 1

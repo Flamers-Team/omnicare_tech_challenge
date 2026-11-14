@@ -1,0 +1,26 @@
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+.git
+.github
+.gitignore
+
+# Segredos e dados locais nunca entram na imagem
+**/.env
+backend/dados_locais
+backend/temp_uploads
+backend/uv.out
+backend/uv.err
+*.zip
+*.npz
+
+# Fora da execução do sistema
+backend/tests
+backend/tests_e2e
+training
+docs
+infra
+*.md
