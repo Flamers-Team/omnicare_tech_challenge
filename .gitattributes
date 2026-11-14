@@ -1,0 +1,5 @@
+# Scripts e arquivos de build precisam de LF, mesmo no Windows
+*.sh text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+*.yml text eol=lf
