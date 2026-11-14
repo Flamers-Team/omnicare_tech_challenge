@@ -66,6 +66,30 @@ jobs:
         with:
           context: .
           push: false
+          load: true
           tags: omnicare:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Bibliotecas pesadas importam dentro da imagem
+        run: |
+          docker run --rm omnicare:ci python -c "import cv2, mediapipe, librosa, soundfile, torch, ultralytics, azure.cognitiveservices.speech; print('imports ok')"
+
+      - name: Contêiner sobe e responde a API
+        run: |
+          docker run -d --name omnicare -p 8000:8000 -e AZURE_SPEECH_KEY= -e AZURE_LANGUAGE_KEY= omnicare:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/api/v1/status > status.json; then break; fi
+            sleep 3
+          done
+          cat status.json
+          STAY=$(curl -fsS http://localhost:8000/api/v1/pacientes | python3 -c "import sys,json; print(json.load(sys.stdin)['sugerida'])")
+          curl -fsS "http://localhost:8000/api/v1/pacientes/$STAY/linha-do-tempo" > /dev/null
+          curl -fsS -X POST "http://localhost:8000/api/v1/pacientes/$STAY/marcha/exemplo/alterada" | python3 -c "import sys,json; d=json.load(sys.stdin); assert d['resultado']['alerta'] is True; print('marcha alterada gerou alerta')"
+          curl -fsS http://localhost:8000/ | grep -q "OmniCare AI"
+          curl -fsS http://localhost:8000/static/js/main.js > /dev/null
+          echo "contêiner ok"
+
+      - name: Log do contêiner (se falhar)
+        if: failure()
+        run: docker logs omnicare || true
