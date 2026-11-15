@@ -21,3 +21,9 @@ backend/yolov8n.pt
 .venv/
 backend/uv.out
 backend/uv.err
+
+# Videos de teste nunca entram no repositorio
+*.mp4
+*.mov
+*.avi
+*.mkv
