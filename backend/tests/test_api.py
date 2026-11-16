@@ -47,6 +47,18 @@ def test_home_page_is_served(client):
     assert "OmniCare AI" in response.text
 
 
+def test_frontend_files_are_always_revalidated(client):
+    # Sem isto, o navegador pode mostrar uma versão antiga da tela depois de uma atualização.
+    for path in ("/", "/static/js/main.js", "/static/js/components/SurgeryAnatomy.js", "/static/css/tokens.css"):
+        response = client.get(path)
+        assert response.status_code == 200, path
+        assert response.headers["cache-control"] == "no-cache", path
+    # Se o arquivo não mudou, o servidor só confirma (304), sem reenviar o conteúdo.
+    first = client.get("/static/js/main.js")
+    again = client.get("/static/js/main.js", headers={"If-None-Match": first.headers["etag"]})
+    assert again.status_code == 304
+
+
 def test_status_is_honest_about_what_is_not_connected(client, monkeypatch):
     monkeypatch.setattr(deps.audio_service, "speech_key", "")
     status = client.get("/api/v1/status").json()
