@@ -120,3 +120,28 @@ details summary { cursor: pointer; font-size: 13px; color: var(--ink-2); margin-
 .toast-title { font-weight: 700; font-size: 14px; }
 @keyframes slide-in { from { opacity: 0; transform: translateY(10px); } }
 .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
+
+/* ---------- Desenho das estruturas da cirurgia ---------- */
+.anatomy-figure { margin: 0; display: grid; gap: 8px; }
+.anatomy-svg { display: block; width: 100%; max-width: 860px; height: auto; margin: 0 auto; }
+.anatomy-svg text { font-family: var(--font); }
+.anat-liver { fill: var(--anat-liver); stroke: var(--anat-liver-edge); stroke-width: 2; }
+.anat-gb { fill: var(--anat-gb); stroke: var(--anat-gb-edge); stroke-width: 2; }
+.anat-plate-edge { fill: none; stroke: var(--anat-plate-edge); stroke-width: 15; stroke-linecap: round; }
+.anat-plate { fill: none; stroke: var(--anat-plate); stroke-width: 10; stroke-linecap: round; }
+.anat-zone { fill: var(--anat-zone); stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 5; }
+.anat-artery { fill: none; stroke: var(--anat-artery); stroke-width: 5; stroke-linecap: round; }
+.anat-duct { fill: none; stroke: var(--anat-bile); stroke-linecap: round; }
+.anat-duct-edge { fill: none; stroke: var(--anat-bile-edge); stroke-linecap: round; }
+.anat-tool { fill: none; stroke: var(--anat-tool); stroke-linecap: round; }
+.anat-tool-edge { fill: none; stroke: var(--anat-tool-edge); stroke-linecap: round; }
+.anat-joint { fill: var(--anat-tool-edge); }
+.anat-leader { stroke: var(--ink-2); stroke-width: 1.5; }
+.anat-dot { fill: var(--ink); stroke: var(--surface); stroke-width: 1.5; }
+.anat-badge circle { fill: var(--accent); }
+.anat-badge text { fill: var(--accent-ink); font-size: 13px; font-weight: 700; }
+.anat-label { fill: var(--ink); font-size: 15px; font-weight: 600; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.anat-context { fill: var(--ink-2); font-size: 13px; font-style: italic; }
+.anatomy-legend { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px 20px; }
+.anatomy-legend li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; }
+.num-badge { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; margin-top: 1px; }

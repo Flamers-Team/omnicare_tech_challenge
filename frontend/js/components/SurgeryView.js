@@ -3,9 +3,11 @@ import { api, postFile } from "../api.js";
 import { store } from "../store.js";
 import { num } from "../format.js";
 import { createSurgeryChart } from "../charts.js";
+import SurgeryAnatomy from "./SurgeryAnatomy.js";
 
 export default {
   name: "SurgeryView",
+  components: { SurgeryAnatomy },
   setup() {
     const busy = ref(false);
     const error = ref("");
@@ -143,12 +145,15 @@ export default {
             </section>
           </div>
         </div>
-
-        <section class="card">
-          <h2 style="margin-bottom: 8px">Laudo</h2>
-          <p class="small" style="margin: 0">{{ store.surgery.laudo }}</p>
-        </section>
       </template>
+
+      <!-- Desenho fixo: fica abaixo das estruturas detectadas e antes do laudo, com ou sem análise feita. -->
+      <SurgeryAnatomy />
+
+      <section class="card" v-if="store.surgery">
+        <h2 style="margin-bottom: 8px">Laudo</h2>
+        <p class="small" style="margin: 0">{{ store.surgery.laudo }}</p>
+      </section>
 
       <section class="card" v-if="store.surgeryInfo">
         <h2 style="margin-bottom: 8px">Quanto confiar neste alerta</h2>

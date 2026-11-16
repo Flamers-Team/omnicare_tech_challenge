@@ -29,6 +29,20 @@
 
   --line: #2563eb;
 
+  /* Desenho das estruturas da cirurgia (aba Centro cirúrgico) */
+  --anat-liver: #eec2b5;
+  --anat-liver-edge: #b4705f;
+  --anat-gb: #a8d18f;
+  --anat-gb-edge: #4f8a3a;
+  --anat-bile: #e3c45a;
+  --anat-bile-edge: #9c7d1c;
+  --anat-artery: #d63c3c;
+  --anat-plate: #fbeccf;
+  --anat-plate-edge: #c99a52;
+  --anat-zone: rgba(37, 99, 235, .14);
+  --anat-tool: #a3acb7;
+  --anat-tool-edge: #59626d;
+
   --radius: 14px;
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 4px 14px rgba(15, 23, 42, .06);
@@ -60,6 +74,18 @@
     --crit-soft: #3d1618;
     --info-soft: #1b2a55;
     --line: #6b9bff;
+    --anat-liver: #6e3a33;
+    --anat-liver-edge: #b7776a;
+    --anat-gb: #3d6a31;
+    --anat-gb-edge: #93c97f;
+    --anat-bile: #d9b64a;
+    --anat-bile-edge: #8a6d12;
+    --anat-artery: #f26b6b;
+    --anat-plate: #c4a774;
+    --anat-plate-edge: #5e4826;
+    --anat-zone: rgba(107, 155, 255, .2);
+    --anat-tool: #7d8794;
+    --anat-tool-edge: #b9c2cc;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
     --shadow-lg: 0 10px 30px rgba(0, 0, 0, .5);
   }
@@ -88,6 +114,18 @@
   --crit-soft: #3d1618;
   --info-soft: #1b2a55;
   --line: #6b9bff;
+  --anat-liver: #6e3a33;
+  --anat-liver-edge: #b7776a;
+  --anat-gb: #3d6a31;
+  --anat-gb-edge: #93c97f;
+  --anat-bile: #d9b64a;
+  --anat-bile-edge: #8a6d12;
+  --anat-artery: #f26b6b;
+  --anat-plate: #c4a774;
+  --anat-plate-edge: #5e4826;
+  --anat-zone: rgba(107, 155, 255, .2);
+  --anat-tool: #7d8794;
+  --anat-tool-edge: #b9c2cc;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 14px rgba(0, 0, 0, .25);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, .5);
 }

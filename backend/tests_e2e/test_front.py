@@ -1,8 +1,10 @@
+import json
 import re
 
 from playwright.sync_api import expect
 
-from tests_e2e.conftest import make_wav
+from services.surgery_video_service import RULE_FILE, STRUCTURE_NAMES
+from tests_e2e.conftest import BACKEND, make_wav
 
 
 def open_alert_count(page) -> int:
@@ -133,6 +135,18 @@ def test_surgery_tab_renders(page):
     page.get_by_role("tab", name="Centro cirúrgico").click()
     expect(page.get_by_role("heading", name="Analisar uma cirurgia")).to_be_visible()
     expect(page.get_by_role("heading", name="Quanto confiar neste alerta")).to_be_visible()
+    assert page.errors == []
+
+
+def test_surgery_drawing_shows_every_detected_structure(page):
+    # O desenho é fixo, aparece antes de qualquer análise e segue os nomes e a ordem da tabela "Estruturas detectadas".
+    ap50 = json.loads((BACKEND / "models" / RULE_FILE).read_text(encoding="utf-8"))["detector_ap50_teste"]
+    table_order = [STRUCTURE_NAMES[name] for name in sorted(STRUCTURE_NAMES, key=lambda item: -ap50[item])]
+    page.get_by_role("tab", name="Centro cirúrgico").click()
+    drawing = page.get_by_test_id("anatomy")
+    expect(drawing.get_by_role("img", name=re.compile("retirada da vesícula"))).to_be_visible()
+    expect(drawing.locator(".anat-label")).to_have_text(table_order)
+    expect(drawing.locator(".anatomy-legend li")).to_have_count(len(table_order))
     assert page.errors == []
 
 
