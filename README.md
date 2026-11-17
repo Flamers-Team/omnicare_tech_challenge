@@ -2,7 +2,17 @@
 
 Sistema de monitoramento hospitalar multimodal do Tech Challenge da Fase 4 (Pós-Tech IA para Devs, FIAP). É um protótipo acadêmico, sem validação clínica, para apoio à decisão.
 
-O **relatório técnico** (fluxo multimodal, modelos por tipo de dado, resultados e exemplos de anomalias) está em [docs/Relatorio_Tecnico.md](docs/Relatorio_Tecnico.md). O guia completo, escrito para quem está começando, está em [docs/Guia_do_Projeto_OmniCare.docx](docs/Guia_do_Projeto_OmniCare.docx).
+O **relatório técnico** (fluxo multimodal, modelos por tipo de dado, resultados e exemplos de anomalias) está em [docs/Relatorio_Tecnico_OmniCare.docx](docs/Relatorio_Tecnico_OmniCare.docx).
+
+## Ambiente publicado
+
+**Aplicação no Azure:** https://omnicare-bsfzezg5b9dpb7ey.westus3-01.azurewebsites.net/
+
+* Documentação interativa da API (Swagger): https://omnicare-bsfzezg5b9dpb7ey.westus3-01.azurewebsites.net/docs
+* Roda em um Azure App Service (Linux, plano B1, região West US 3) a partir de uma imagem Docker. A imagem é publicada pela pipeline de CI/CD descrita na seção 3.
+* A transcrição e a análise de texto usam os recursos Azure Speech e Azure Language do projeto, configurados no próprio App Service.
+* Se o endereço não responder, o app pode estar parado para economizar. Ele é ligado pelo workflow **Controle do ambiente** (seção 3). O primeiro acesso depois de ligar demora um pouco, porque o app carrega os modelos.
+* É um protótipo acadêmico, **sem login**. Os dados clínicos são os da base pública MIMIC-IV Demo, e a análise de cirurgia por vídeo de teste não está disponível na nuvem, porque a base Endoscapes tem licença restrita.
 
 ## 1. Fluxo multimodal
 
@@ -91,7 +101,10 @@ omnicare_tech_challenge/
 │   ├── js/                   # api, store, gráficos, áudio e componentes
 │   └── vendor/               # Vue e Chart.js locais (funciona sem internet)
 ├── training/                 # treino, avaliação e resultados
-└── docs/                     # relatório técnico e guia
+├── infra/                    # configuração única do Azure (azure-setup.sh)
+├── .github/workflows/        # CI, deploy e controle do ambiente
+├── Dockerfile
+└── docs/                     # relatório técnico
 ```
 
 O front usa Vue 3 e Chart.js copiados para `frontend/vendor/`, então a demonstração não depende de internet. O tema claro ou escuro segue o sistema e pode ser trocado no botão do topo. Os alertas aparecem em tempo real, com um aviso flutuante e o contador na aba.
@@ -115,13 +128,47 @@ Eles cobrem o carregamento sem erros e sem CDN, os cinco gráficos, o monitorame
 
 ### CI/CD e hospedagem no Azure
 
-* **CI** (`.github/workflows/ci.yml`): a cada push e pull request roda ruff, os testes da API e dos serviços, os testes no navegador (Chromium do Playwright, sem chaves do Azure) e confere que a imagem Docker constrói.
-* **Deploy** (`deploy.yml`, manual): constrói a imagem, envia para o Azure Container Registry, aponta o App Service para ela e faz um teste de fumaça em `/api/v1/status`.
-* **Start e stop** (`controle.yml`, manual): na aba Actions, escolha *status*, *start* ou *stop*. Parar o app **não** para a cobrança do plano B1; para não pagar, apague o plano no portal.
-* **Configuração única do Azure:** `infra/azure-setup.sh`, rodado no Cloud Shell. Cria o registry, as permissões e as configurações do app, e pede as chaves do Azure sem exibi-las.
-* O login do GitHub no Azure é por OIDC, sem senha guardada. No GitHub ficam os segredos `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` e `AZURE_SUBSCRIPTION_ID` e a variável `ACR_NAME`.
+Há três pipelines no GitHub Actions, em `.github/workflows/`:
+
+| Pipeline | Quando roda | O que faz |
+|---|---|---|
+| **CI** (`ci.yml`) | Automático, a cada push e pull request | Testa o código e confere que a imagem Docker funciona |
+| **Deploy no Azure** (`deploy.yml`) | Manual | Publica a versão da `main` no Azure |
+| **Controle do ambiente** (`controle.yml`) | Manual | Consulta, liga ou desliga o app |
+
+O deploy e o controle são manuais de propósito, para que nenhum push gaste nuvem sem você querer.
+
+**CI.** Dois jobs rodam em paralelo:
+1. *testes*: ruff, testes da API e dos serviços (`pytest`) e testes no navegador (Chromium do Playwright, microfone simulado). Tudo **sem chaves do Azure**, então nenhum teste chama serviços pagos.
+2. *imagem*: constrói a imagem Docker, importa dentro dela as bibliotecas pesadas (OpenCV, MediaPipe, torch, ultralytics, SDK do Azure Speech), sobe o contêiner e confere a API (status, linha do tempo, uma análise de marcha que gera alerta e o front sendo servido).
+
+O resultado aparece na aba **Actions**. Se dois pushes seguidos chegarem na mesma branch, o primeiro run é cancelado, e isso é esperado.
+
+**Como publicar (deploy).**
+1. No GitHub, aba **Actions** → **Deploy no Azure** → **Run workflow**, com a branch **main**.
+2. O job faz login no Azure, constrói a imagem e a envia ao Azure Container Registry, aponta o App Service para a imagem nova, reinicia o app e faz um teste de fumaça em `/api/v1/status` (espera até cerca de 10 minutos).
+3. O resumo do run mostra o endereço do app. A primeira execução leva de 10 a 15 minutos, e as seguintes são mais rápidas por causa do cache.
+
+**Como ligar e desligar.** **Actions** → **Controle do ambiente** → **Run workflow** e escolha:
+* `status`: mostra se o app está em execução ou parado;
+* `start`: liga o app e espera ele responder;
+* `stop`: desliga o app.
+
+Parar o app **não** para a cobrança do plano B1, que é cobrado por hora enquanto existir. Para não pagar, apague o plano no portal do Azure.
+
+**Configuração.**
+* O login do GitHub no Azure é por **OIDC**, sem senha guardada, e vale só para este repositório e a branch `main`. Por isso o deploy e o controle devem ser rodados a partir da `main`.
+* No GitHub (Settings → Secrets and variables → Actions) ficam os segredos `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` e `AZURE_SUBSCRIPTION_ID` e a variável `ACR_NAME`.
+* As chaves do Azure Speech e Language ficam nas configurações do App Service, nunca na imagem nem no repositório.
+* **Configuração única do Azure:** `infra/azure-setup.sh`, rodado no Cloud Shell (`bash azure-setup.sh <nome-do-acr>`). Cria o registry, as permissões e as configurações do app (porta 8000, tempo de início maior, alertas persistentes), e pede as chaves do Azure sem exibi-las. Só precisa rodar de novo se o ambiente for recriado.
 * A imagem usa PyTorch só para CPU. Build local: `docker build -t omnicare .` e `docker run -p 8000:8000 omnicare`.
-* O app não tem autenticação. Se for exposto, restrinja o acesso por IP ou pelo login do Entra no próprio App Service.
+
+**Problemas comuns.**
+* Erro `AADSTS700213` no login do Azure: a credencial federada não corresponde ao repositório. O GitHub usa um formato com os IDs da organização e do repositório; se o repositório for renomeado ou recriado, é preciso cadastrar o novo *subject* no Azure.
+* Erro no login do registry: falta a variável `ACR_NAME` (fica em *Variables*, não em *Secrets*).
+* O app não responde no teste de fumaça: ele pode estar carregando os modelos. Veja os logs em *Centro de Implantação* no portal do Azure.
+
+**Segurança.** O app não tem autenticação. Para um ambiente exposto, restrinja o acesso por IP ou pelo login do Entra no App Service e defina `OMNICARE_ALLOW_RESET=false` nas configurações do app, o que desliga o botão de limpar alertas.
 
 ## 4. Resultados
 
